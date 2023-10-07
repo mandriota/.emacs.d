@@ -1,0 +1,179 @@
+#+TITLE: GNU Emacs Config
+#+AUTHOR: Mark Mandriota
+#+STARTUP: showeverything
+
+* Basic Environment Variables
+#+begin_src emacs-lisp :results silent
+(setenv "LDFLAGS" "-L/opt/homebrew/opt/openssl@3/lib")
+(setenv "CFLAGS" "-I/opt/homebrew/opt/openssl@3/include")
+
+(add-to-list 'exec-path "/opt/homebrew/bin")
+(add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "~/.cargo/bin")
+(add-to-list 'exec-path "~/go/bin")
+
+(setenv "PATH" (mapconcat #'identity exec-path path-separator))
+
+(setenv "PATH"
+		(concat
+		 (getenv "PATH")
+		 "/opt/homebrew/opt/llvm@14/bin" path-separator
+		 "~/.emacs.d/bin" path-separator
+		 "/opt/local/bin" path-separator
+		 "/opt/local/sbin" path-separator
+		 "/opt/homebrew/sbin" path-separator
+		 "/System/Cryptexes/App/usr/bin" path-separator
+		 "/usr/bin" path-separator
+		 "/bin" path-separator
+		 "/usr/sbin" path-separator
+		 "/sbin" path-separator
+		 "/usr/local/go/bin" path-separator
+		 "/Library/TeX/Distributions/Programs/texbin"))
+#+end_src
+
+* Basic Debug
+#+begin_src emacs-lisp :results silent
+(add-hook 'after-init-hook (lambda () (message (emacs-init-time))))
+#+end_src
+
+* Basic Appearance
+#+begin_src emacs-lisp :results silent
+(scroll-bar-mode -1)
+(set-fringe-mode 5)
+(tool-bar-mode -1)
+(tooltip-mode -1)
+
+(setq visible-bell t)
+(setq-default tab-width 4)
+
+(set-face-attribute 'default nil :font "Fira Code Retina" :height 135)
+#+end_src
+
+* Basic Settings
+#+begin_src emacs-lisp :results silent
+(global-auto-revert-mode 1)
+(save-place-mode 1)
+(recentf-mode 1)
+
+(setq inhibit-startup-screen t
+	  use-dialog-box nil)
+#+end_src
+
+* Basic Keybindings
+#+begin_src emacs-lisp :results silent
+(setq ns-alternate-modifier 'meta
+	  ns-right-alternate-modifier 'none)
+#+end_src
+
+* Basic Windowing
+#+begin_src emacs-lisp :results silent
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings 'meta))
+#+end_src
+
+* Basic Theme
+#+begin_src emacs-lisp :results silent
+(load-theme 'wombat)
+#+end_src
+
+* Basic Org Mode
+** Babel
+#+begin_src emacs-lisp :results silent
+(setq org-startup-indented t
+	  org-confirm-babel-evaluate nil
+	  org-edit-src-content-indentation 0
+	  org-src-tab-acts-natively t
+	  org-src-preserve-indentation t
+	  org-image-actual-width nil)
+
+(defun user/indent-org-block ()
+  (interactive)
+  (when (org-in-src-block-p)
+	(org-edit-special)
+	(indent-region (point-min) (point-max))
+	(org-edit-src-exit)))
+
+(define-key org-mode-map (kbd "C-i") #'user/indent-org-block)
+#+end_src
+
+* Package Manager
+#+begin_src emacs-lisp :results silent
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+						 ("elpa" . "http://tromey.com/elpa/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+#+end_src
+
+* Theme
+#+begin_src emacs-lisp :results silent
+(use-package doom-themes
+  :config
+  (setq doom-themes-enable-bold t
+		doom-themes-enable-italic t)
+  (load-theme 'doom-nord t)
+
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config))
+#+end_src
+
+* God Mode
+#+begin_src emacs-lisp :results silent
+(use-package god-mode)
+(god-mode)
+
+(global-set-key (kbd "<escape>") #'god-mode-all)
+
+(defun user/god-mode-update-cursor ()
+  (if (or god-local-mode buffer-read-only)
+	  (progn (setq cursor-type 'box) (set-cursor-color "#ff007f"))
+	(progn (setq cursor-type 'bar) (set-cursor-color "#ffffff"))))
+
+(add-hook 'post-command-hook #'user/god-mode-update-cursor)
+#+end_src
+
+* Text Editing
+#+begin_src emacs-lisp
+(use-package whole-line-or-region
+  :config
+  (whole-line-or-region-global-mode))
+#+end_src
+
+* LSP Mode
+#+begin_src emacs-lisp :results silent
+(use-package go-mode
+  :mode "\\.go\\'")
+(use-package rustic
+  :mode ("\\.rs\\'" . rustic-mode)
+  :config
+  (setq rustic-format-on-save t))
+(use-package lsp-mode
+  :hook (
+		 (lsp-mode . lsp-enable-which-key-integration))
+		 (elisp-mode . lsp)
+		 (go-mode . lsp)
+		 (rustic . lsp)
+		 (c-mode . lsp)
+  :commands lsp)
+
+(use-package lsp-ui :commands lsp-ui-mode)
+
+(use-package company
+  :config
+  (add-hook 'after-init-hook 'global-company-mode)
+  (setq company-idle-delay 0
+		company-minimum-prefix-length 1
+		company-selection-wrap-around t)
+  (company-tng-configure-default))
+#+end_src
