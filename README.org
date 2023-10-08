@@ -142,10 +142,17 @@
 #+end_src
 
 * Text Editing
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :results silent
 (use-package whole-line-or-region
   :config
   (whole-line-or-region-global-mode))
+#+end_src
+
+* Which Key Mode
+#+begin_src emacs-lisp :results silent
+(use-package which-key
+  :config
+  (which-key-mode))
 #+end_src
 
 * LSP Mode
