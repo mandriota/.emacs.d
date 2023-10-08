@@ -77,11 +77,6 @@
   (windmove-default-keybindings 'meta))
 #+end_src
 
-* Basic Theme
-#+begin_src emacs-lisp :results silent
-(load-theme 'wombat)
-#+end_src
-
 * Basic Org Mode
 #+begin_src emacs-lisp :results silent
 (setq org-startup-indented t
