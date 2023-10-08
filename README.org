@@ -47,7 +47,12 @@
 (setq visible-bell t)
 (setq-default tab-width 4)
 
-(set-face-attribute 'default nil :font "Fira Code Retina" :height 135)
+(defun user/try-set-face-attribute (font height)
+  (if (null (x-list-fonts font))
+	  (message (format "Failed to locate font '%s'" font))
+	(set-face-attribute 'default nil :font font :height height)))
+
+(user/try-set-face-attribute "Fira Code Retina" 135)
 #+end_src
 
 * Basic Settings
