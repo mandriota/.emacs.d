@@ -162,7 +162,10 @@
   :commands lsp)
 
 (use-package lsp-ui :commands lsp-ui-mode)
+#+end_src
 
+** Company Mode
+#+begin_src emacs-lisp :results silent
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
