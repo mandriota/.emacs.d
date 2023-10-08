@@ -39,8 +39,10 @@
 (scroll-bar-mode -1)
 (set-fringe-mode 5)
 (tool-bar-mode -1)
-(menu-bar-mode -1)
 (tooltip-mode -1)
+
+(unless (eq system-type 'darwin)
+  (menu-bar-mode -1))
 
 (setq visible-bell t)
 (setq-default tab-width 4)
@@ -83,6 +85,15 @@
 	  org-src-tab-acts-natively t
 	  org-src-preserve-indentation t
 	  org-image-actual-width nil)
+
+(defun user/indent-org-block ()
+  (interactive)
+  (when (org-in-src-block-p)
+    (org-edit-special)
+    (indent-region (point-min) (point-max))
+    (org-edit-src-exit)))
+
+(define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
 #+end_src
 
 * Package Manager
