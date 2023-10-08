@@ -83,15 +83,6 @@
 	  org-src-tab-acts-natively t
 	  org-src-preserve-indentation t
 	  org-image-actual-width nil)
-
-(defun user/indent-org-block ()
-  (interactive)
-  (when (org-in-src-block-p)
-	(org-edit-special)
-	(indent-region (point-min) (point-max))
-	(org-edit-src-exit)))
-
-(define-key org-mode-map (kbd "C-i") #'user/indent-org-block)
 #+end_src
 
 * Package Manager
@@ -164,12 +155,11 @@
   :config
   (setq rustic-format-on-save t))
 (use-package lsp-mode
-  :hook (
-		 (lsp-mode . lsp-enable-which-key-integration))
+  :hook ((lsp-mode . lsp-enable-which-key-integration)
 		 (elisp-mode . lsp)
 		 (go-mode . lsp)
 		 (rustic . lsp)
-		 (c-mode . lsp)
+		 (c-mode . lsp))
   :commands lsp)
 
 (use-package lsp-ui :commands lsp-ui-mode)
