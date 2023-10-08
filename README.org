@@ -130,8 +130,9 @@
 
 * God Mode
 #+begin_src emacs-lisp :results silent
-(use-package god-mode)
-(god-mode)
+(use-package god-mode
+  :config
+  (god-mode))
 
 (global-set-key (kbd "<escape>") #'god-mode-all)
 
