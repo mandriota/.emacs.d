@@ -139,7 +139,15 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+
+(setq use-package-always-ensure t)
+
+(use-package straight
+  :custom
+  (straight-use-package-by-default t))
 #+end_src
+
+#+RESULTS:
 
 * Theme
 #+begin_src emacs-lisp :results silent
