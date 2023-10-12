@@ -222,10 +222,19 @@
 #+end_src
 
 * Typst Mode
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :results silent
 (use-package typst-ts-mode
   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
   :custom
   (typst-ts-mode-watch-options "--open"))
 #+end_src
   
+* Messengers
+** Telegram
+#+begin_src emacs-lisp :results silent
+(use-package telega
+  :commands (telega)
+  :defer t
+  :config
+  (define-key global-map (kbd "C-c t") telega-prefix-map))
+#+end_src
