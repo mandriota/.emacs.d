@@ -75,6 +75,11 @@
 #+begin_src emacs-lisp :results silent
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'meta))
+
+(global-set-key (kbd "C-S-p") 'enlarge-window)
+(global-set-key (kbd "C-S-h") 'shrink-window)
+(global-set-key (kbd "C-S-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "C-S-<right>") 'enlarge-window-horizontally)
 #+end_src
 
 * Basic Org Mode
@@ -189,6 +194,11 @@
 (use-package which-key
   :config
   (which-key-mode))
+#+end_src
+
+* Magit
+#+begin_src emacs-lisp :results silent
+(use-package magit)
 #+end_src
 
 * LSP Mode
