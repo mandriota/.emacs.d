@@ -76,10 +76,8 @@
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'meta))
 
-(global-set-key (kbd "C-S-p") 'enlarge-window)
-(global-set-key (kbd "C-S-h") 'shrink-window)
-(global-set-key (kbd "C-S-<left>") 'shrink-window-horizontally)
-(global-set-key (kbd "C-S-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "M-3") 'enlarge-window)
+(global-set-key (kbd "M-2") 'enlarge-window-horizontally)
 #+end_src
 
 * Basic Org Mode
