@@ -41,6 +41,9 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 
+(setq-default cursor-type 'box)
+(blink-cursor-mode -1)
+
 (unless (eq system-type 'darwin)
   (menu-bar-mode -1))
 
@@ -174,8 +177,8 @@
 
 (defun user/god-mode-update-cursor ()
   (if (or god-local-mode buffer-read-only)
-	  (progn (setq cursor-type 'box) (set-cursor-color "#ff007f"))
-	(progn (setq cursor-type 'bar) (set-cursor-color "#ffffff"))))
+	  (set-cursor-color "#ff007f")
+	(set-cursor-color "#ffffff")))
 
 (add-hook 'post-command-hook #'user/god-mode-update-cursor)
 #+end_src
@@ -186,6 +189,18 @@
   :config
   (whole-line-or-region-global-mode))
 #+end_src
+
+** Multiple cursors
+#+begin_src emacs-lisp :results silent
+(use-package multiple-cursors)
+
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click)
+#+end_src
+
 
 * Which Key Mode
 #+begin_src emacs-lisp :results silent
