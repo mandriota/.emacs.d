@@ -177,8 +177,8 @@
 
 (defun user/god-mode-update-cursor ()
   (if (or god-local-mode buffer-read-only)
-	  (set-cursor-color "#ff007f")
-	(set-cursor-color "#ffffff")))
+	  (set-cursor-color "cyan")
+	(set-cursor-color "white")))
 
 (add-hook 'post-command-hook #'user/god-mode-update-cursor)
 #+end_src
@@ -222,6 +222,7 @@
   :mode ("\\.rs\\'" . rustic-mode)
   :config
   (setq rustic-format-on-save t))
+(use-package fish-mode)
 (use-package lsp-mode
   :hook ((lsp-mode . lsp-enable-which-key-integration)
 		 (elisp-mode . lsp)
