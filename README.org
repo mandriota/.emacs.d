@@ -40,6 +40,7 @@
 (set-fringe-mode 5)
 (tool-bar-mode -1)
 (tooltip-mode -1)
+(set-frame-parameter nil 'undecorated t)
 
 (setq-default cursor-type 'box)
 (blink-cursor-mode -1)
@@ -66,6 +67,11 @@
 
 (setq inhibit-startup-screen t
 	  use-dialog-box nil)
+
+(let ((sh-path "/opt/homebrew/bin/fish"))
+  (if (file-exists-p sh-path)
+	  (setq-default explicit-shell-file-name sh-path)
+	(message "fish shell not found")))
 #+end_src
 
 * Basic Keybindings
