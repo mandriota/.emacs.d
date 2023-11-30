@@ -40,7 +40,6 @@
 (set-fringe-mode 5)
 (tool-bar-mode -1)
 (tooltip-mode -1)
-(set-frame-parameter nil 'undecorated t)
 
 (setq-default cursor-type 'box)
 (blink-cursor-mode -1)
@@ -229,8 +228,12 @@
   :config
   (setq rustic-format-on-save t))
 (use-package fish-mode)
+;; (use-package racket-mode)
+(use-package geiser-guile)
 (use-package lsp-mode
   :hook ((lsp-mode . lsp-enable-which-key-integration)
+		 ;; (racket-mode . lsp)
+		 (geiser-guil . lsp)
 		 (elisp-mode . lsp)
 		 (go-mode . lsp)
 		 (rustic . lsp)
