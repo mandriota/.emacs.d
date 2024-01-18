@@ -107,6 +107,12 @@
 (define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
 #+end_src
 
+* Spell check
+#+begin_src emacs-lisp :results silent
+(setq ispell-program-name "aspell") 
+(setq ispell-list-command "list")
+#+end_src
+
 * Basic Tree Sitter
 #+begin_src emacs-lisp :results silent
 (setq treesit-language-source-alist
@@ -212,12 +218,6 @@
 (use-package which-key
   :config
   (which-key-mode))
-#+end_src
-
-* Spell check
-#+begin_src emacs-lisp :results silent
-(setq ispell-program-name "aspell") 
-(setq ispell-list-command "list")
 #+end_src
 
 * Magit
