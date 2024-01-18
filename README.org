@@ -214,6 +214,12 @@
   (which-key-mode))
 #+end_src
 
+* Spell check
+#+begin_src emacs-lisp :results silent
+(setq ispell-program-name "aspell") 
+(setq ispell-list-command "list")
+#+end_src
+
 * Magit
 #+begin_src emacs-lisp :results silent
 (use-package magit)
@@ -261,7 +267,7 @@
   :custom
   (typst-ts-mode-watch-options "--open"))
 #+end_src
-  
+
 * Messengers
 ** Telegram
 #+begin_src emacs-lisp :results silent
@@ -269,5 +275,12 @@
   :commands (telega)
   :defer t)
 
+(add-hook 'telega-load-hook 'telega-notifications-mode)
+(use-package language-detection)
 (define-key global-map (kbd "C-c t") telega-prefix-map)
+#+end_src
+
+* Start Server
+#+begin_src emacs-lisp :results silent
+(server-start)
 #+end_src
