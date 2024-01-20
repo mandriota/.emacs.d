@@ -214,9 +214,9 @@
 
 ** Insert Kaomoji
 #+begin_src emacs-lisp :results silent
-(use-package insert-kaomoji
-  :config
-  (global-set-key (kbd "C-S-k") #'insert-kaomoji))
+(use-package insert-kaomoji)
+
+(global-set-key (kbd "C-S-k") #'insert-kaomoji)
 #+end_src
 
 * Which Key Mode
