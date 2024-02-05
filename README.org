@@ -387,9 +387,7 @@ Readable LaTeX:
 (define-key global-map (kbd "C-c t") telega-prefix-map)
 #+end_src
 
-* Readers
-** Nov
-EPUB reader:
+* EPUB reader
 #+begin_src emacs-lisp :results silent
 (use-package nov
   :config
