@@ -30,26 +30,31 @@
 #+end_src
 
 * Basic Debug
+Print start-up time:
 #+begin_src emacs-lisp :results silent
 (add-hook 'after-init-hook (lambda () (message (emacs-init-time))))
 #+end_src
 
 * Basic Appearance
+** General Window Appearance
 #+begin_src emacs-lisp :results silent
 (scroll-bar-mode -1)
 (set-fringe-mode 5)
 (tool-bar-mode -1)
 (tooltip-mode -1)
 
-(setq-default cursor-type 'box)
-(blink-cursor-mode -1)
-
 (unless (eq system-type 'darwin)
   (menu-bar-mode -1))
+#+end_src
 
-(setq visible-bell t)
-(setq-default tab-width 4)
+** Cursor
+#+begin_src emacs-lisp :results silent
+(setq-default cursor-type 'box)
+(blink-cursor-mode -1)
+#+end_src
 
+** Set Font (Fira Code Retina)
+#+begin_src emacs-lisp :results silent
 (defun user/try-set-face-attribute (font height)
   (if (null (x-list-fonts font))
 	  (message (format "Failed to locate font '%s'" font))
@@ -66,7 +71,12 @@
 
 (setq inhibit-startup-screen t
 	  use-dialog-box nil)
+#+end_src
 
+* Basic Shell
+** Set Shell Path
+Try to set fish shell as a default shell. Fish is a smart and user-friendly shell:
+#+begin_src emacs-lisp :results silent
 (let ((sh-path "/opt/homebrew/bin/fish"))
   (if (file-exists-p sh-path)
 	  (setq-default explicit-shell-file-name sh-path)
@@ -82,10 +92,18 @@
 * Basic Windowing
 #+begin_src emacs-lisp :results silent
 (when (fboundp 'windmove-default-keybindings)
-  (windmove-default-keybindings 'meta))
+  (windmove-default-keybindings 'control))
 
 (global-set-key (kbd "M-3") 'enlarge-window)
 (global-set-key (kbd "M-2") 'enlarge-window-horizontally)
+#+end_src
+
+* Basic Text Editing
+#+begin_src emacs-lisp :results silent
+(setq visible-bell t)
+(setq-default tab-width 4)
+
+(setq-default fill-column 90)
 #+end_src
 
 * Basic Org Mode
@@ -107,7 +125,7 @@
 (define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
 #+end_src
 
-* Spell check
+* Basic Spell check
 #+begin_src emacs-lisp :results silent
 (setq ispell-program-name "aspell") 
 (setq ispell-list-command "list")
@@ -143,7 +161,8 @@
 #+end_src
 
 * Package Manager
-#+begin_src emacs-lisp results silent
+Bootstrap straight. Straight is an overengineered package manager:
+#+begin_src emacs-lisp :results silent
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -156,15 +175,19 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+#+end_src
 
+Always ensure that packages are installed:
+#+begin_src emacs-lisp :results silent
 (setq use-package-always-ensure t)
+#+end_src
 
+Why it works?:
+#+begin_src emacs-lisp :results silent
 (use-package straight
   :custom
   (straight-use-package-by-default t))
 #+end_src
-
-#+RESULTS:
 
 * All The Icons
 #+begin_src emacs-lisp :results silent
@@ -172,13 +195,20 @@
   :if (display-graphic-p))
 #+end_src
 
-* All The Icons Dired
+** All The Icons Dired
 #+begin_src emacs-lisp :results silent
 (use-package all-the-icons-dired
   :if (display-graphic-p)
   :straight (:type git :host github :repo "jtbm37/all-the-icons-dired")
   :config
   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+#+end_src
+
+** All The Icons Ivy Rich
+#+begin_src emacs-lisp :results silent
+(use-package all-the-icons-ivy-rich
+  :after ivy-rich
+  :init (all-the-icons-ivy-rich-mode 1))
 #+end_src
 
 * Theme
@@ -193,11 +223,38 @@
   (doom-themes-org-config))
 #+end_src
 
-* God Mode
+* Projectile
 #+begin_src emacs-lisp :results silent
-(use-package god-mode
+(use-package projectile
   :config
-  (god-mode))
+  (projectile-mode +1)
+  (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
+#+end_src
+
+* Dashboard
+#+begin_src emacs-lisp :results silent
+(use-package dashboard
+  :config
+  (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (projects . 5)
+                          (agenda . 5)
+                          (registers . 5)))
+  (setq dashboard-icon-type 'all-the-icons)
+  ;; (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (dashboard-setup-startup-hook))
+#+end_src
+
+* Text Editing
+#+begin_src emacs-lisp :results silent
+(use-package whole-line-or-region
+  :config (whole-line-or-region-global-mode))
+#+end_src
+
+** God Mode
+#+begin_src emacs-lisp :results silent
+(use-package god-mode)
 
 (global-set-key (kbd "<escape>") #'god-mode-all)
 
@@ -209,22 +266,9 @@
 (add-hook 'post-command-hook #'user/god-mode-update-cursor)
 #+end_src
 
-* Dashboard
+** Elgrep
 #+begin_src emacs-lisp :results silent
-(use-package dashboard
-  :ensure t
-  :config
-  (setq dashboard-icon-type 'all-the-icons)
-  ;; (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (dashboard-setup-startup-hook))
-#+end_src
-
-* Text Editing
-#+begin_src emacs-lisp :results silent
-(use-package whole-line-or-region
-  :config
-  (whole-line-or-region-global-mode))
+(use-package elgrep)
 #+end_src
 
 ** Multiple cursors
@@ -250,6 +294,27 @@
 (use-package which-key
   :config
   (which-key-mode))
+#+end_src
+
+* Ivy
+#+begin_src emacs-lisp :results silent
+(use-package ivy
+  :config
+  (ivy-mode))
+#+end_src
+
+** Counsel
+#+begin_src emacs-lisp :results silent
+(use-package counsel
+  :config (counsel-mode))
+#+end_src
+
+** Ivy Rich
+#+begin_src emacs-lisp :results silent
+(use-package ivy-rich
+  :config
+  (ivy-rich-mode 1)
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 #+end_src
 
 * Magit
@@ -293,6 +358,7 @@
 #+end_src
 
 * Typst Mode
+Readable LaTeX:
 #+begin_src emacs-lisp :results silent
 (use-package typst-ts-mode
   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
@@ -310,6 +376,26 @@
 (add-hook 'telega-load-hook 'telega-notifications-mode)
 (use-package language-detection)
 (define-key global-map (kbd "C-c t") telega-prefix-map)
+#+end_src
+
+* Readers
+** Nov
+EPUB reader:
+#+begin_src emacs-lisp :results silent
+(use-package nov
+  :config
+  (defun my-nov-font-setup ()
+	(face-remap-add-relative 'variable-pitch :family "Georgia"
+                             :height 1.2))
+  (add-hook 'nov-mode-hook 'my-nov-font-setup)
+
+  (setq nov-text-width t)
+  (setq visual-fill-column-center-text t)
+  
+  (add-hook 'nov-mode-hook 'visual-line-mode)
+  (add-hook 'nov-mode-hook 'visual-fill-column-mode)
+  
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+end_src
 
 * Start Server
