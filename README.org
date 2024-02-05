@@ -5,6 +5,7 @@
 * Prerequisites
 - Fish UNIX Shell (optional)
 - Git
+- GNU Aspell
 
 ** Fonts
 - Fira Code (optional)
