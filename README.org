@@ -232,12 +232,18 @@ Why it works?:
   (doom-themes-org-config))
 #+end_src
 
-* Projectile
+* Source Browsing
+** Projectile
 #+begin_src emacs-lisp :results silent
 (use-package projectile
   :config
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
+#+end_src
+
+** Elgrep
+#+begin_src emacs-lisp :results silent
+(use-package elgrep)
 #+end_src
 
 * Dashboard
@@ -272,11 +278,6 @@ Why it works?:
 	(set-cursor-color "white")))
 
 (add-hook 'post-command-hook #'user/god-mode-update-cursor)
-#+end_src
-
-** Elgrep
-#+begin_src emacs-lisp :results silent
-(use-package elgrep)
 #+end_src
 
 ** Multiple cursors
