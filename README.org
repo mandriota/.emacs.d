@@ -2,6 +2,14 @@
 #+AUTHOR: Mark Mandriota
 #+STARTUP: showeverything
 
+* Prerequisites
+- Fish UNIX Shell (optional)
+- Git
+
+** Fonts
+- Fira Code (optional)
+- Georgia
+
 * Basic Environment Variables
 #+begin_src emacs-lisp :results silent
 (setenv "LDFLAGS" "-L/opt/homebrew/opt/openssl@3/lib")
@@ -235,11 +243,10 @@ Why it works?:
 #+begin_src emacs-lisp :results silent
 (use-package dashboard
   :config
-  (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (agenda . 5)
-                          (registers . 5)))
+  (setq dashboard-items '((recents  . 7)
+                          (projects . 4)
+                          (agenda . 4)
+                          (registers . 4)))
   (setq dashboard-icon-type 'all-the-icons)
   ;; (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
@@ -384,10 +391,13 @@ EPUB reader:
 #+begin_src emacs-lisp :results silent
 (use-package nov
   :config
-  (defun my-nov-font-setup ()
-	(face-remap-add-relative 'variable-pitch :family "Georgia"
-                             :height 1.2))
-  (add-hook 'nov-mode-hook 'my-nov-font-setup)
+  (let ((font "Georgia"))
+	(defun user/nov-font-setup ()
+	  (face-remap-add-relative 'variable-pitch :family font
+                               :height 1.2))
+	(if (null (x-list-fonts font))
+		(message (format "Failed to locate font '%s'" font))
+	  (add-hook 'nov-mode-hook 'user/nov-font-setup)))
 
   (setq nov-text-width t)
   (setq visual-fill-column-center-text t)
