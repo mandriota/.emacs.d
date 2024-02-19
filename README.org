@@ -9,7 +9,7 @@
 
 ** Fonts
 - Fira Code (optional)
-- Georgia (optional)
+- Georgia
 
 * Basic Environment Variables
 #+begin_src emacs-lisp :results silent
@@ -54,6 +54,8 @@ Print start-up time:
 
 (unless (eq system-type 'darwin)
   (menu-bar-mode -1))
+
+(setq column-number-mode t)
 #+end_src
 
 ** Cursor
@@ -66,7 +68,7 @@ Print start-up time:
 #+begin_src emacs-lisp :results silent
 (defun user/try-set-face-attribute (font height)
   (if (null (x-list-fonts font))
-	  (message (format "Failed to locate font '%s'" font))
+	  (message "Failed to locate font '%s'" font)
 	(set-face-attribute 'default nil :font font :height height)))
 
 (user/try-set-face-attribute "Fira Code Retina" 135)
@@ -80,6 +82,11 @@ Print start-up time:
 
 (setq inhibit-startup-screen t
 	  use-dialog-box nil)
+
+(setq read-process-output-max (* 1024 1024))
+(setq gc-cons-threshold 100000000)
+
+(setq initial-scratch-message nil)
 #+end_src
 
 * Basic Shell
@@ -102,9 +109,6 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 #+begin_src emacs-lisp :results silent
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'control))
-
-(global-set-key (kbd "M-3") 'enlarge-window)
-(global-set-key (kbd "M-2") 'enlarge-window-horizontally)
 #+end_src
 
 * Basic Text Editing
@@ -122,7 +126,8 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 	  org-edit-src-content-indentation 0
 	  org-src-tab-acts-natively t
 	  org-src-preserve-indentation t
-	  org-image-actual-width nil)
+	  org-image-actual-width nil
+	  org-support-shift-select t)
 
 (defun user/indent-org-block ()
   (interactive)
@@ -186,16 +191,9 @@ Bootstrap straight. Straight is an overengineered package manager:
   (load bootstrap-file nil 'nomessage))
 #+end_src
 
-Always ensure that packages are installed:
+Add use-package support:
 #+begin_src emacs-lisp :results silent
-(setq use-package-always-ensure t)
-#+end_src
-
-Why it works?:
-#+begin_src emacs-lisp :results silent
-(use-package straight
-  :custom
-  (straight-use-package-by-default t))
+(setq straight-use-package-by-default t)
 #+end_src
 
 * All The Icons
@@ -207,7 +205,6 @@ Why it works?:
 ** All The Icons Dired
 #+begin_src emacs-lisp :results silent
 (use-package all-the-icons-dired
-  :if (display-graphic-p)
   :after all-the-icons
   :straight (:type git :host github :repo "jtbm37/all-the-icons-dired")
   :config
@@ -226,7 +223,7 @@ Why it works?:
 (use-package doom-themes
   :config
   (setq doom-themes-enable-bold t
-		doom-themes-enable-italic t)
+    	doom-themes-enable-italic t)
   (load-theme 'doom-nord t)
 
   (doom-themes-visual-bell-config)
@@ -254,11 +251,16 @@ Why it works?:
   :config
   (setq dashboard-items '((recents  . 7)
                           (projects . 4)
-                          (agenda . 4)
-                          (registers . 4)))
-  (setq dashboard-icon-type 'all-the-icons)
-  ;; (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
+                          (agenda . 2)
+                          (registers . 2)
+						  (bookmarks . 4)))
+  (setq dashboard-icon-type 'all-the-icons
+		;; dashboard-set-heading-icons t
+		dashboard-set-file-icons t
+		dashboard-startup-banner nil
+		dashboard-banner-logo-title nil
+		dashboard-set-init-info nil)
+  ;; (setq )
   (dashboard-setup-startup-hook))
 #+end_src
 
@@ -286,18 +288,28 @@ Why it works?:
 #+begin_src emacs-lisp :results silent
 (use-package multiple-cursors)
 
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-s-c") 'mc/edit-lines)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-z") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-(global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click)
+(global-set-key (kbd "s-<mouse-1>") 'mc/add-cursor-on-click)
 #+end_src
 
 ** Insert Kaomoji
 #+begin_src emacs-lisp :results silent
 (use-package insert-kaomoji)
 
-(global-set-key (kbd "C-S-k") #'insert-kaomoji)
+(global-set-key (kbd "C-s-k") #'insert-kaomoji)
+#+end_src
+
+** Snippets
+#+begin_src emacs-lisp :results silent
+(use-package yasnippet
+  :config
+  (setq yas-snippet-dirs '("~/.emacs.d/user_snippets"
+						   ;; "~/.emacs.d/doom_snippets"
+						   "~/.emacs.d/AndreaCrotti_snippets"))
+  (yas-global-mode 1))
 #+end_src
 
 * Which Key Mode
@@ -321,7 +333,8 @@ Why it works?:
 #+begin_src emacs-lisp :results silent
 (use-package counsel
   :after ivy
-  :config (counsel-mode))
+  :config
+  (counsel-mode))
 #+end_src
 
 ** Ivy Rich
@@ -359,7 +372,11 @@ Why it works?:
 		 (c-mode . lsp))
   :commands lsp)
 
-(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui :commands lsp-ui-mode
+  :config
+  (setq lsp-ui-imenu-auto-refresh t)
+  (setq lsp-ui-imenu-refresh-delay 0.1))
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 #+end_src
 
 ** Company Mode
@@ -367,10 +384,18 @@ Why it works?:
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
+  (global-set-key (kbd "C-c y") 'company-yasnippet)
+
   (setq company-idle-delay 0
 		company-minimum-prefix-length 1
 		company-selection-wrap-around t)
   (company-tng-configure-default))
+#+end_src
+
+* Org Mode
+** Org Babel
+#+begin_src emacs-lisp :results silent
+(use-package ob-go)
 #+end_src
 
 * Typst Mode
@@ -398,13 +423,10 @@ Readable LaTeX:
 #+begin_src emacs-lisp :results silent
 (use-package nov
   :config
-  (let ((font "Georgia"))
 	(defun user/nov-font-setup ()
-	  (face-remap-add-relative 'variable-pitch :family font
+	  (face-remap-add-relative 'variable-pitch :family "Georgia"
                                :height 1.2))
-	(if (null (x-list-fonts font))
-		(message (format "Failed to locate font '%s'" font))
-	  (add-hook 'nov-mode-hook 'user/nov-font-setup)))
+	(add-hook 'nov-mode-hook 'user/nov-font-setup)
 
   (setq nov-text-width t)
   (setq visual-fill-column-center-text t)
