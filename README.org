@@ -109,6 +109,11 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 #+begin_src emacs-lisp :results silent
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'control))
+
+(global-set-key (kbd "C-x C-1") #'delete-other-windows)
+(global-set-key (kbd "C-x C-2") #'split-window-below)
+(global-set-key (kbd "C-x C-3") #'split-window-right)
+(global-set-key (kbd "C-x C-0") #'delete-window)
 #+end_src
 
 * Basic Text Editing
@@ -272,9 +277,14 @@ Add use-package support:
 
 ** God Mode
 #+begin_src emacs-lisp :results silent
-(use-package god-mode)
+(use-package god-mode
+  :config
+  (global-set-key (kbd "<escape>") #'god-mode)
 
-(global-set-key (kbd "<escape>") #'god-mode-all)
+  (define-key god-local-mode-map (kbd "z") #'repeat)
+  
+  (define-key god-local-mode-map (kbd "[") #'backward-paragraph)
+  (define-key god-local-mode-map (kbd "]") #'forward-paragraph))
 
 (defun user/god-mode-update-cursor ()
   (if (or god-local-mode buffer-read-only)
