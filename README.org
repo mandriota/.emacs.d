@@ -81,7 +81,8 @@ Print start-up time:
 (recentf-mode 1)
 
 (setq inhibit-startup-screen t
-	  use-dialog-box nil)
+	  use-dialog-box nil
+	  ns-pop-up-frames nil)
 
 (setq read-process-output-max (* 1024 1024))
 (setq gc-cons-threshold 100000000)
@@ -199,6 +200,13 @@ Bootstrap straight. Straight is an overengineered package manager:
 Add use-package support:
 #+begin_src emacs-lisp :results silent
 (setq straight-use-package-by-default t)
+#+end_src
+
+* Fira Code Ligatures
+#+begin_src emacs-lisp :results silent
+(use-package fira-code-mode
+  :custom (fira-code-mode-disabled-ligatures '())
+  :hook prog-mode)
 #+end_src
 
 * All The Icons

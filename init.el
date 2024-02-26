@@ -12,7 +12,9 @@
  '(org-safe-remote-resources
    '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
  '(package-selected-packages
-   '(typst-ts-mode which-key whole-line-or-region rustic lsp-ui god-mode go-mode go-autocomplete doom-themes company)))
+   '(typst-ts-mode which-key whole-line-or-region rustic lsp-ui god-mode go-mode go-autocomplete doom-themes company))
+ '(smtpmail-smtp-server "smtp.google.com")
+ '(smtpmail-smtp-service 25))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
