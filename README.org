@@ -14,7 +14,7 @@
 - Georgia
 
 * Basic Environment Variables
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (setenv "LDFLAGS" "-L/opt/homebrew/opt/openssl@3/lib")
 (setenv "CFLAGS" "-I/opt/homebrew/opt/openssl@3/include")
 
@@ -42,12 +42,12 @@
 
 * Basic Debug
 Print start-up time:
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (add-hook 'after-init-hook (lambda () (message (emacs-init-time))))
 #+end_src
 
 * Basic Settings
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (global-auto-revert-mode 1)
 (save-place-mode 1)
 (recentf-mode 1)
@@ -64,7 +64,7 @@ Print start-up time:
 #+end_src
 
 ** Appearance
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (setq column-number-mode t)
 (blink-cursor-mode -1)
 #+end_src
@@ -72,7 +72,7 @@ Print start-up time:
 * Basic Shell
 ** Set Shell Path
 Try to set fish shell as a default shell. Fish is a smart and user-friendly shell:
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (let ((sh-path "/opt/homebrew/bin/fish"))
   (if (file-exists-p sh-path)
 	  (setq-default explicit-shell-file-name sh-path)
@@ -80,13 +80,13 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 #+end_src
 
 * Basic Keybindings
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (setq ns-alternate-modifier 'meta
 	  ns-right-alternate-modifier 'none)
 #+end_src
 
 * Basic Windowing
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'control))
 
@@ -97,7 +97,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 #+end_src
 
 * Basic Text Editing
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (setq visible-bell t)
 (setq-default tab-width 4)
 
@@ -105,7 +105,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 #+end_src
 
 * Basic Org Mode
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (setq org-startup-indented t
 	  org-confirm-babel-evaluate nil
 	  org-edit-src-content-indentation 0
@@ -125,13 +125,13 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 #+end_src
 
 * Basic Spell check
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (setq ispell-program-name "aspell") 
 (setq ispell-list-command "list")
 #+end_src
 
 * Basic Tree Sitter
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (setq treesit-language-source-alist
 	  '((bash "https://github.com/tree-sitter/tree-sitter-bash")
 		(c "https://github.com/tree-sitter/tree-sitter-c")
@@ -161,7 +161,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 
 * Package Manager
 Bootstrap straight. Straight is an overengineered package manager:
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -177,12 +177,12 @@ Bootstrap straight. Straight is an overengineered package manager:
 #+end_src
 
 Add use-package support:
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (setq straight-use-package-by-default t)
 #+end_src
 
 * Theme
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package doom-themes
   :config
   (setq doom-themes-enable-bold t
@@ -194,20 +194,20 @@ Add use-package support:
 #+end_src
 
 * Fira Code Ligatures
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package fira-code-mode
   :custom (fira-code-mode-disabled-ligatures '())
   :hook prog-mode)
 #+end_src
 
 * All The Icons
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package all-the-icons
   :if (display-graphic-p))
 #+end_src
 
 ** All The Icons Dired
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package all-the-icons-dired
   :after all-the-icons
   :straight (:type git :host github :repo "jtbm37/all-the-icons-dired")
@@ -216,7 +216,7 @@ Add use-package support:
 #+end_src
 
 ** All The Icons Ivy Rich
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package all-the-icons-ivy-rich
   :after (all-the-icons ivy-rich)
   :init (all-the-icons-ivy-rich-mode 1))
@@ -224,7 +224,7 @@ Add use-package support:
 
 * Source Browsing
 ** Projectile
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package projectile
   :config
   (projectile-mode +1)
@@ -232,12 +232,12 @@ Add use-package support:
 #+end_src
 
 ** Elgrep
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package elgrep)
 #+end_src
 
 * Dashboard
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package dashboard
   :after (projectile all-the-icons)
   :config
@@ -257,13 +257,13 @@ Add use-package support:
 #+end_src
 
 * Text Editing
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package whole-line-or-region
   :config (whole-line-or-region-global-mode))
 #+end_src
 
 ** God Mode
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package god-mode
   :config
   (global-set-key (kbd "<escape>") #'god-mode)
@@ -282,7 +282,7 @@ Add use-package support:
 #+end_src
 
 ** Multiple cursors
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package multiple-cursors
   :config
   (global-set-key (kbd "C-s-c") 'mc/edit-lines)
@@ -293,14 +293,14 @@ Add use-package support:
 #+end_src
 
 ** Insert Kaomoji
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package insert-kaomoji)
 
 (global-set-key (kbd "C-s-k") #'insert-kaomoji)
 #+end_src
 
 ** Snippets
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package yasnippet
   :config
   (setq yas-snippet-dirs '(;; "~/.emacs.d/user_snippets"
@@ -310,14 +310,14 @@ Add use-package support:
 #+end_src
 
 * Which Key Mode
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package which-key
   :config
   (which-key-mode))
 #+end_src
 
 * Ivy
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package ivy
   :config
   (ivy-mode)
@@ -327,7 +327,7 @@ Add use-package support:
 #+end_src
 
 ** Counsel
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package counsel
   :after ivy
   :config
@@ -335,7 +335,7 @@ Add use-package support:
 #+end_src
 
 ** Ivy Rich
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package ivy-rich
   :after ivy
   :config
@@ -344,12 +344,12 @@ Add use-package support:
 #+end_src
 
 * Magit
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package magit)
 #+end_src
 
 * LSP Mode
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package go-mode
   :mode "\\.go\\'")
 (use-package rustic
@@ -377,7 +377,7 @@ Add use-package support:
 #+end_src
 
 ** Company Mode
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
@@ -391,13 +391,13 @@ Add use-package support:
 
 * Org Mode
 ** Org Babel
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package ob-go)
 #+end_src
 
 * Typst Mode
 Readable LaTeX:
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package typst-ts-mode
   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
   :custom
@@ -405,7 +405,7 @@ Readable LaTeX:
 #+end_src
 
 * EPUB reader
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package nov
   :config
 	(defun user/nov-font-setup ()
@@ -423,6 +423,6 @@ Readable LaTeX:
 #+end_src
 
 * Start Server
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (server-start)
 #+end_src
