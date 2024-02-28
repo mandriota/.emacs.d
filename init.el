@@ -60,7 +60,7 @@
 (setq visible-bell t)
 (setq-default tab-width 4)
 
-(setq-default fill-column 90)
+(require 'org)
 
 (setq org-startup-indented t
 	  org-confirm-babel-evaluate nil
@@ -77,7 +77,7 @@
     (indent-region (point-min) (point-max))
     (org-edit-src-exit)))
 
-;; (define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
+(define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
 
 (setq ispell-program-name "aspell") 
 (setq ispell-list-command "list")
@@ -277,6 +277,12 @@
   :custom
   (typst-ts-mode-watch-options "--open"))
 
+(use-package visual-fill-column
+  :commands visual-fill-column-mode
+  :config
+  (setq visual-fill-column-center-text t)
+  (setq visual-fill-column-width 90))
+
 (use-package nov
   :config
 	(defun user/nov-font-setup ()
@@ -285,11 +291,10 @@
 	(add-hook 'nov-mode-hook 'user/nov-font-setup)
 
   (setq nov-text-width t)
-  (setq visual-fill-column-center-text t)
-  
+
   (add-hook 'nov-mode-hook 'visual-line-mode)
   (add-hook 'nov-mode-hook 'visual-fill-column-mode)
-  
+
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
 (server-start)

@@ -100,12 +100,12 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 #+begin_src emacs-lisp
 (setq visible-bell t)
 (setq-default tab-width 4)
-
-(setq-default fill-column 90)
 #+end_src
 
 * Basic Org Mode
 #+begin_src emacs-lisp
+(require 'org)
+
 (setq org-startup-indented t
 	  org-confirm-babel-evaluate nil
 	  org-edit-src-content-indentation 0
@@ -121,7 +121,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
     (indent-region (point-min) (point-max))
     (org-edit-src-exit)))
 
-;; (define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
+(define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
 #+end_src
 
 * Basic Spell check
@@ -404,6 +404,15 @@ Readable LaTeX:
   (typst-ts-mode-watch-options "--open"))
 #+end_src
 
+* Visual Fill Column Mode
+#+begin_src emacs-lisp
+(use-package visual-fill-column
+  :commands visual-fill-column-mode
+  :config
+  (setq visual-fill-column-center-text t)
+  (setq visual-fill-column-width 90))
+#+end_src
+
 * EPUB reader
 #+begin_src emacs-lisp
 (use-package nov
@@ -414,11 +423,10 @@ Readable LaTeX:
 	(add-hook 'nov-mode-hook 'user/nov-font-setup)
 
   (setq nov-text-width t)
-  (setq visual-fill-column-center-text t)
-  
+
   (add-hook 'nov-mode-hook 'visual-line-mode)
   (add-hook 'nov-mode-hook 'visual-fill-column-mode)
-  
+
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+end_src
 
