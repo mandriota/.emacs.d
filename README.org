@@ -1,3 +1,5 @@
+# -*- after-save-hook: (org-babel-tangle) -*-
+#+PROPERTY: header-args:emacs-lisp :exports code :results none :tangle init.el
 #+TITLE: GNU Emacs Config
 #+AUTHOR: Mark Mandriota
 #+STARTUP: showeverything
@@ -8,7 +10,7 @@
 - GNU Aspell
 
 ** Fonts
-- Fira Code (optional)
+- Fira Code
 - Georgia
 
 * Basic Environment Variables
@@ -44,36 +46,6 @@ Print start-up time:
 (add-hook 'after-init-hook (lambda () (message (emacs-init-time))))
 #+end_src
 
-* Basic Appearance
-** General Window Appearance
-#+begin_src emacs-lisp :results silent
-(scroll-bar-mode -1)
-(set-fringe-mode 5)
-(tool-bar-mode -1)
-(tooltip-mode -1)
-
-(unless (eq system-type 'darwin)
-  (menu-bar-mode -1))
-
-(setq column-number-mode t)
-#+end_src
-
-** Cursor
-#+begin_src emacs-lisp :results silent
-(setq-default cursor-type 'box)
-(blink-cursor-mode -1)
-#+end_src
-
-** Set Font (Fira Code Retina)
-#+begin_src emacs-lisp :results silent
-(defun user/try-set-face-attribute (font height)
-  (if (null (x-list-fonts font))
-	  (message "Failed to locate font '%s'" font)
-	(set-face-attribute 'default nil :font font :height height)))
-
-(user/try-set-face-attribute "Fira Code Retina" 135)
-#+end_src
-
 * Basic Settings
 #+begin_src emacs-lisp :results silent
 (global-auto-revert-mode 1)
@@ -85,9 +57,16 @@ Print start-up time:
 	  ns-pop-up-frames nil)
 
 (setq read-process-output-max (* 1024 1024))
-(setq gc-cons-threshold 100000000)
+(setq gc-cons-threshold 100000000
+	  gc-cons-percentage 0.5)
 
 (setq initial-scratch-message nil)
+#+end_src
+
+** Appearance
+#+begin_src emacs-lisp :results silent
+(setq column-number-mode t)
+(blink-cursor-mode -1)
 #+end_src
 
 * Basic Shell
@@ -142,7 +121,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
     (indent-region (point-min) (point-max))
     (org-edit-src-exit)))
 
-(define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
+;; (define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
 #+end_src
 
 * Basic Spell check
@@ -202,6 +181,18 @@ Add use-package support:
 (setq straight-use-package-by-default t)
 #+end_src
 
+* Theme
+#+begin_src emacs-lisp :results silent
+(use-package doom-themes
+  :config
+  (setq doom-themes-enable-bold t
+    	doom-themes-enable-italic t)
+  (load-theme 'doom-nord t)
+
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config))
+#+end_src
+
 * Fira Code Ligatures
 #+begin_src emacs-lisp :results silent
 (use-package fira-code-mode
@@ -229,18 +220,6 @@ Add use-package support:
 (use-package all-the-icons-ivy-rich
   :after (all-the-icons ivy-rich)
   :init (all-the-icons-ivy-rich-mode 1))
-#+end_src
-
-* Theme
-#+begin_src emacs-lisp :results silent
-(use-package doom-themes
-  :config
-  (setq doom-themes-enable-bold t
-    	doom-themes-enable-italic t)
-  (load-theme 'doom-nord t)
-
-  (doom-themes-visual-bell-config)
-  (doom-themes-org-config))
 #+end_src
 
 * Source Browsing
@@ -324,7 +303,7 @@ Add use-package support:
 #+begin_src emacs-lisp :results silent
 (use-package yasnippet
   :config
-  (setq yas-snippet-dirs '("~/.emacs.d/user_snippets"
+  (setq yas-snippet-dirs '(;; "~/.emacs.d/user_snippets"
 						   ;; "~/.emacs.d/doom_snippets"
 						   "~/.emacs.d/AndreaCrotti_snippets"))
   (yas-global-mode 1))
@@ -423,18 +402,6 @@ Readable LaTeX:
   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
   :custom
   (typst-ts-mode-watch-options "--open"))
-#+end_src
-
-* Messengers
-** Telegram
-#+begin_src emacs-lisp :results silent
-(use-package telega
-  :commands (telega)
-  :defer t)
-
-(add-hook 'telega-load-hook 'telega-notifications-mode)
-(use-package language-detection)
-(define-key global-map (kbd "C-c t") telega-prefix-map)
 #+end_src
 
 * EPUB reader
