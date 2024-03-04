@@ -124,16 +124,17 @@
 (setq straight-use-package-by-default t)
 
 (use-package doom-themes
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
   :config
-  (setq doom-themes-enable-bold t
-    	doom-themes-enable-italic t)
   (load-theme 'doom-nord t)
 
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
 (use-package fira-code-mode
-  :custom (fira-code-mode-disabled-ligatures '())
+  :custom (fira-code-mode-disabled-ligatures '("[]"))
   :hook prog-mode)
 
 (use-package all-the-icons
@@ -156,21 +157,23 @@
 
 (use-package elgrep)
 
+(use-package vterm)
+
 (use-package dashboard
   :after (projectile all-the-icons)
+  :custom
+  (dashboard-items '((recents  . 7)
+                     (projects . 4)
+                     (agenda . 2)
+                     (registers . 2)
+					 (bookmarks . 4)))
+  (dashboard-icon-type 'all-the-icons
+					   ;; dashboard-set-heading-icons t
+					   dashboard-set-file-icons t
+					   dashboard-startup-banner nil
+					   dashboard-banner-logo-title nil
+					   dashboard-set-init-info nil)
   :config
-  (setq dashboard-items '((recents  . 7)
-                          (projects . 4)
-                          (agenda . 2)
-                          (registers . 2)
-						  (bookmarks . 4)))
-  (setq dashboard-icon-type 'all-the-icons
-		;; dashboard-set-heading-icons t
-		dashboard-set-file-icons t
-		dashboard-startup-banner nil
-		dashboard-banner-logo-title nil
-		dashboard-set-init-info nil)
-  ;; (setq )
   (dashboard-setup-startup-hook))
 
 (use-package whole-line-or-region
@@ -205,10 +208,10 @@
 (global-set-key (kbd "C-s-k") #'insert-kaomoji)
 
 (use-package yasnippet
+  :custom
+  (yas-snippet-dirs '(;; "~/.emacs.d/user_snippets"
+					  "~/.emacs.d/AndreaCrotti_snippets"))
   :config
-  (setq yas-snippet-dirs '(;; "~/.emacs.d/user_snippets"
-						   ;; "~/.emacs.d/doom_snippets"
-						   "~/.emacs.d/AndreaCrotti_snippets"))
   (yas-global-mode 1))
 
 (use-package which-key
@@ -239,8 +242,8 @@
   :mode "\\.go\\'")
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
-  :config
-  (setq rustic-format-on-save t))
+  :custom
+  (rustic-format-on-save t))
 (use-package fish-mode)
 ;; (use-package racket-mode)
 (use-package geiser-guile)
@@ -254,20 +257,18 @@
 		 (c-mode . lsp))
   :commands lsp)
 
-(use-package lsp-ui :commands lsp-ui-mode
-  :config
-  (setq lsp-ui-imenu-auto-refresh t)
-  (setq lsp-ui-imenu-refresh-delay 0.1))
+(use-package lsp-ui :commands lsp-ui-mode)
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
 (use-package company
+  :custom
+  (company-idle-delay 0)
+  (company-minimum-prefix-length 1)
+  (company-selection-wrap-around t)
   :config
   (add-hook 'after-init-hook 'global-company-mode)
   (global-set-key (kbd "C-c y") 'company-yasnippet)
 
-  (setq company-idle-delay 0
-		company-minimum-prefix-length 1
-		company-selection-wrap-around t)
   (company-tng-configure-default))
 
 (use-package ob-go)
@@ -279,19 +280,19 @@
 
 (use-package visual-fill-column
   :commands visual-fill-column-mode
-  :config
-  (setq visual-fill-column-center-text t)
-  (setq visual-fill-column-width 90))
+  :custom
+  (visual-fill-column-center-text t)
+  (visual-fill-column-width 90))
 
 (use-package nov
+  :custom
+  (nov-text-width t)
   :config
 	(defun user/nov-font-setup ()
 	  (face-remap-add-relative 'variable-pitch :family "Georgia"
                                :height 1.2))
 	(add-hook 'nov-mode-hook 'user/nov-font-setup)
-
-  (setq nov-text-width t)
-
+	
   (add-hook 'nov-mode-hook 'visual-line-mode)
   (add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
