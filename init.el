@@ -141,7 +141,7 @@
   (doom-themes-org-config))
 
 (use-package fira-code-mode
-  :custom (fira-code-mode-disabled-ligatures '("[]"))
+  :custom (fira-code-mode-disabled-ligatures '("[]" "x"))
   :hook prog-mode)
 
 (use-package all-the-icons
@@ -255,6 +255,7 @@
   :mode ("\\.fish$")
   :config
   (setq fish-enable-auto-indent t))
+
 ;; (use-package racket-mode)
 (use-package geiser-guile)
 (use-package lsp-mode
@@ -280,11 +281,6 @@
   (global-set-key (kbd "C-c y") 'company-yasnippet)
 
   (company-tng-configure-default))
-
-(use-package company-shell
-  :after company
-  :config
-  (push 'company-fish-shell company-backends))
 
 (use-package ob-go)
 (use-package ob-fish

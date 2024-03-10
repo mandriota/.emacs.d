@@ -204,7 +204,7 @@ Add use-package support:
 * Fira Code Ligatures
 #+begin_src emacs-lisp
 (use-package fira-code-mode
-  :custom (fira-code-mode-disabled-ligatures '("[]"))
+  :custom (fira-code-mode-disabled-ligatures '("[]" "x"))
   :hook prog-mode)
 #+end_src
 
@@ -373,6 +373,7 @@ Add use-package support:
   :mode ("\\.fish$")
   :config
   (setq fish-enable-auto-indent t))
+
 ;; (use-package racket-mode)
 (use-package geiser-guile)
 (use-package lsp-mode
@@ -401,11 +402,6 @@ Add use-package support:
   (global-set-key (kbd "C-c y") 'company-yasnippet)
 
   (company-tng-configure-default))
-
-(use-package company-shell
-  :after company
-  :config
-  (push 'company-fish-shell company-backends))
 #+end_src
 
 * Org Mode
