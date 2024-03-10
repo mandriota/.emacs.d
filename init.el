@@ -5,6 +5,7 @@
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "~/.cargo/bin")
 (add-to-list 'exec-path "~/go/bin")
+(add-to-list 'exec-path "/opt/homebrew/Cellar/libgccjit/13.2.0/lib/gcc/current/")
 
 (setenv "PATH"
 		(concat
@@ -27,6 +28,8 @@
 (global-auto-revert-mode 1)
 (save-place-mode 1)
 (recentf-mode 1)
+(setq recentf-max-menu-items 50
+	  recentf-max-saved-items 50)
 
 (setq inhibit-startup-screen t
 	  use-dialog-box nil
@@ -38,6 +41,8 @@
 
 (setq initial-scratch-message nil)
 
+(setq dired-dwim-target t)
+
 (setq column-number-mode t)
 (blink-cursor-mode -1)
 
@@ -48,6 +53,8 @@
 
 (setq ns-alternate-modifier 'meta
 	  ns-right-alternate-modifier 'none)
+
+(global-set-key (kbd "C-c r") #'recentf)
 
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'control))
@@ -167,12 +174,12 @@
                      (agenda . 2)
                      (registers . 2)
 					 (bookmarks . 4)))
-  (dashboard-icon-type 'all-the-icons
-					   ;; dashboard-set-heading-icons t
-					   dashboard-set-file-icons t
-					   dashboard-startup-banner nil
-					   dashboard-banner-logo-title nil
-					   dashboard-set-init-info nil)
+  (dashboard-icon-type 'all-the-icons)
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+  (dashboard-startup-banner nil)
+  (dashboard-banner-logo-title nil)
+  (dashboard-set-init-info nil)
   :config
   (dashboard-setup-startup-hook))
 
@@ -244,7 +251,10 @@
   :mode ("\\.rs\\'" . rustic-mode)
   :custom
   (rustic-format-on-save t))
-(use-package fish-mode)
+(use-package fish-mode
+  :mode ("\\.fish$")
+  :config
+  (setq fish-enable-auto-indent t))
 ;; (use-package racket-mode)
 (use-package geiser-guile)
 (use-package lsp-mode
@@ -271,7 +281,18 @@
 
   (company-tng-configure-default))
 
+(use-package company-shell
+  :after company
+  :config
+  (push 'company-fish-shell company-backends))
+
 (use-package ob-go)
+(use-package ob-fish
+  :straight  (:type git :host github :repo "takeokunn/ob-fish"))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (C . t)))
 
 (use-package typst-ts-mode
   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
@@ -297,5 +318,13 @@
   (add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+
+(use-package telega
+  :commands (telega)
+  :defer t)
+
+(add-hook 'telega-load-hook 'telega-notifications-mode)
+(use-package language-detection)
+(define-key global-map (kbd "C-c t") telega-prefix-map)
 
 (server-start)
