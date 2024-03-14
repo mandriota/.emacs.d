@@ -210,9 +210,10 @@
   (global-set-key (kbd "C-c C-(") 'mc/mark-all-like-this)
   (global-set-key (kbd "s-<mouse-1>") 'mc/add-cursor-on-click))
 
-(use-package insert-kaomoji)
+(use-package kaomel
+  :straight  (:type git :host github :repo "gicrisf/kaomel"))
 
-(global-set-key (kbd "C-s-k") #'insert-kaomoji)
+(global-set-key (kbd "C-s-k") #'kaomel-insert)
 
 (use-package yasnippet
   :custom

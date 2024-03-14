@@ -305,11 +305,12 @@ Add use-package support:
   (global-set-key (kbd "s-<mouse-1>") 'mc/add-cursor-on-click))
 #+end_src
 
-** Insert Kaomoji
+** Kaomoji
 #+begin_src emacs-lisp
-(use-package insert-kaomoji)
+(use-package kaomel
+  :straight  (:type git :host github :repo "gicrisf/kaomel"))
 
-(global-set-key (kbd "C-s-k") #'insert-kaomoji)
+(global-set-key (kbd "C-s-k") #'kaomel-insert)
 #+end_src
 
 ** Snippets
