@@ -59,6 +59,8 @@
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'control))
 
+(setq mouse-autoselect-window t)
+
 (global-set-key (kbd "C-x C-1") #'delete-other-windows)
 (global-set-key (kbd "C-x C-2") #'split-window-below)
 (global-set-key (kbd "C-x C-3") #'split-window-right)
