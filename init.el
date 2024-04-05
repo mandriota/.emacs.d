@@ -69,6 +69,8 @@
 (setq visible-bell t)
 (setq-default tab-width 4)
 
+(global-set-key (kbd "C-x s") #'replace-string)
+
 (require 'org)
 
 (setq org-startup-indented t
@@ -248,8 +250,6 @@
 
 (use-package magit)
 
-(use-package go-mode
-  :mode "\\.go\\'")
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
   :custom
@@ -258,21 +258,40 @@
   :mode ("\\.fish$")
   :config
   (setq fish-enable-auto-indent t))
+(use-package zig-mode)
+
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+
+;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+
+(use-package dap-mode)
 
 ;; (use-package racket-mode)
 (use-package geiser-guile)
 (use-package lsp-mode
+  :custom
+  (lsp-keymap-prefix "C-c l")
   :hook ((lsp-mode . lsp-enable-which-key-integration)
 		 ;; (racket-mode . lsp)
 		 (geiser-guil . lsp)
 		 (elisp-mode . lsp)
-		 (go-mode . lsp)
+		 (go-ts-mode . lsp)
 		 (rustic . lsp)
-		 (c-mode . lsp))
-  :commands lsp)
+		 ;; (c-ts-mode . lsp)
+		 (c-mode . lsp)
+		 (zig . lsp))
+  :commands lsp
+  :config
+  (require 'dap-cpptools))
 
-(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil))
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+
+(setq c-default-style "linux")
+(add-hook 'c-mode-hook (lambda () (c-set-style "linux")))
 
 (use-package company
   :custom
