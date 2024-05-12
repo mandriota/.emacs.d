@@ -13,6 +13,15 @@
 - Fira Code
 - Georgia
 
+* Start Client
+#+begin_src emacs-lisp
+(require 'server)
+(when (server-running-p)
+	(shell-command "tmux new-session -d 'emacsclient -c'")
+	(kill-emacs))
+#+end_src
+
+
 * Basic Environment Variables
 #+begin_src emacs-lisp
 (setenv "LDFLAGS" "-L/opt/homebrew/opt/openssl@3/lib")
@@ -512,5 +521,6 @@ Readable LaTeX:
 
 * Start Server
 #+begin_src emacs-lisp
-(server-start)
+(unless (server-running-p)
+	(server-start))
 #+end_src

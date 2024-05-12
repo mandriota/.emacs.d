@@ -1,3 +1,8 @@
+(require 'server)
+(when (server-running-p)
+	(shell-command "tmux new-session -d 'emacsclient -c'")
+	(kill-emacs))
+
 (setenv "LDFLAGS" "-L/opt/homebrew/opt/openssl@3/lib")
 (setenv "CFLAGS" "-I/opt/homebrew/opt/openssl@3/include")
 
@@ -366,4 +371,5 @@
 (use-package language-detection)
 (define-key global-map (kbd "C-c t") telega-prefix-map)
 
-(server-start)
+(unless (server-running-p)
+	(server-start))
