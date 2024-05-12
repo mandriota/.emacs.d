@@ -46,6 +46,10 @@
 (setq column-number-mode t)
 (blink-cursor-mode -1)
 
+(setq gamegrid-glyph-height-mm 7)
+
+(add-hook 'tetris-mode-hook 'visual-fill-column-mode)
+
 (let ((sh-path "/opt/homebrew/bin/fish"))
   (if (file-exists-p sh-path)
 	  (setq-default explicit-shell-file-name sh-path)
@@ -67,7 +71,7 @@
 (global-set-key (kbd "C-x C-0") #'delete-window)
 
 (setq visible-bell t)
-(setq-default tab-width 4)
+(setq-default tab-width 2)
 
 (global-set-key (kbd "C-x s") #'replace-string)
 
@@ -76,8 +80,6 @@
 (setq org-startup-indented t
 	  org-confirm-babel-evaluate nil
 	  org-edit-src-content-indentation 0
-	  org-src-tab-acts-natively t
-	  org-src-preserve-indentation t
 	  org-image-actual-width nil
 	  org-support-shift-select t)
 
@@ -88,7 +90,30 @@
     (indent-region (point-min) (point-max))
     (org-edit-src-exit)))
 
-(define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
+(define-key org-mode-map (kbd "C-i") #'user/indent-org-block)
+
+(setq c-basic-offset 2)
+(setq c-indent-level 2)
+(setq tab-width 2)
+
+(defun user/outline-level ()
+  "Custom outline level based on the comment labels."
+  (looking-at outline-regexp)
+  (let ((match (match-string 0)))
+    (if (null match) 1
+      (length match))))
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (outline-minor-mode 1)
+            (setq outline-regexp "//=:[a-zA-Z]+\\(:[a-zA-Z]+\\)?")
+            (setq outline-level 'user/outline-level)
+						(hide-body)))
+
+(global-set-key (kbd "C-c i") 'outline-hide-body)
+(global-set-key (kbd "C-c o") 'outline-hide-other)
+(global-set-key (kbd "C-c p") 'outline-show-entry)
+(global-set-key (kbd "C-c u") 'outline-show-all)
 
 (setq ispell-program-name "aspell") 
 (setq ispell-list-command "list")
@@ -165,8 +190,6 @@
   :config
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
-
-(use-package elgrep)
 
 (use-package vterm)
 
@@ -259,25 +282,17 @@
   :config
   (setq fish-enable-auto-indent t))
 (use-package zig-mode)
-
-(add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
-
-;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+(use-package go-mode)
 
 (use-package dap-mode)
 
-;; (use-package racket-mode)
-(use-package geiser-guile)
 (use-package lsp-mode
   :custom
   (lsp-keymap-prefix "C-c l")
   :hook ((lsp-mode . lsp-enable-which-key-integration)
-		 ;; (racket-mode . lsp)
-		 (geiser-guil . lsp)
 		 (elisp-mode . lsp)
-		 (go-ts-mode . lsp)
+		 (go-mode . lsp)
 		 (rustic . lsp)
-		 ;; (c-ts-mode . lsp)
 		 (c-mode . lsp)
 		 (zig . lsp))
   :commands lsp
@@ -289,9 +304,6 @@
   :config
   (setq lsp-headerline-breadcrumb-enable nil))
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-
-(setq c-default-style "linux")
-(add-hook 'c-mode-hook (lambda () (c-set-style "linux")))
 
 (use-package company
   :custom
@@ -311,6 +323,15 @@
  'org-babel-load-languages
  '((python . t)
    (C . t)))
+
+(defun toggle-org-html-export-on-save ()
+  (interactive)
+  (if (memq 'org-html-export-to-html after-save-hook)
+      (progn
+        (remove-hook 'after-save-hook 'org-html-export-to-html t)
+        (message "Disabled org html export on save for current buffer..."))
+    (add-hook 'after-save-hook 'org-html-export-to-html nil t)
+    (message "Enabled org html export on save for current buffer...")))
 
 (use-package typst-ts-mode
   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")

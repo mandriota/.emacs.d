@@ -74,6 +74,14 @@ Print start-up time:
 (blink-cursor-mode -1)
 #+end_src
 
+** Games
+#+begin_src emacs-lisp
+(setq gamegrid-glyph-height-mm 7)
+
+(add-hook 'tetris-mode-hook 'visual-fill-column-mode)
+#+end_src
+
+
 * Basic Shell
 ** Set Shell Path
 Try to set fish shell as a default shell. Fish is a smart and user-friendly shell:
@@ -108,7 +116,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 * Basic Text Editing
 #+begin_src emacs-lisp
 (setq visible-bell t)
-(setq-default tab-width 4)
+(setq-default tab-width 2)
 
 (global-set-key (kbd "C-x s") #'replace-string)
 #+end_src
@@ -120,8 +128,6 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 (setq org-startup-indented t
 	  org-confirm-babel-evaluate nil
 	  org-edit-src-content-indentation 0
-	  org-src-tab-acts-natively t
-	  org-src-preserve-indentation t
 	  org-image-actual-width nil
 	  org-support-shift-select t)
 
@@ -132,7 +138,33 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
     (indent-region (point-min) (point-max))
     (org-edit-src-exit)))
 
-(define-key org-mode-map (kbd "TAB") #'user/indent-org-block)
+(define-key org-mode-map (kbd "C-i") #'user/indent-org-block)
+#+end_src
+
+* Basic C Mode
+#+begin_src emacs-lisp
+(setq c-basic-offset 2)
+(setq c-indent-level 2)
+(setq tab-width 2)
+
+(defun user/outline-level ()
+  "Custom outline level based on the comment labels."
+  (looking-at outline-regexp)
+  (let ((match (match-string 0)))
+    (if (null match) 1
+      (length match))))
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (outline-minor-mode 1)
+            (setq outline-regexp "//=:[a-zA-Z]+\\(:[a-zA-Z]+\\)?")
+            (setq outline-level 'user/outline-level)
+						(hide-body)))
+
+(global-set-key (kbd "C-c i") 'outline-hide-body)
+(global-set-key (kbd "C-c o") 'outline-hide-other)
+(global-set-key (kbd "C-c p") 'outline-show-entry)
+(global-set-key (kbd "C-c u") 'outline-show-all)
 #+end_src
 
 * Basic Spell check
@@ -241,11 +273,6 @@ Add use-package support:
   :config
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
-#+end_src
-
-** Elgrep
-#+begin_src emacs-lisp
-(use-package elgrep)
 #+end_src
 
 * VTerm
@@ -377,25 +404,17 @@ Add use-package support:
   :config
   (setq fish-enable-auto-indent t))
 (use-package zig-mode)
-
-(add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
-
-;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+(use-package go-mode)
 
 (use-package dap-mode)
 
-;; (use-package racket-mode)
-(use-package geiser-guile)
 (use-package lsp-mode
   :custom
   (lsp-keymap-prefix "C-c l")
   :hook ((lsp-mode . lsp-enable-which-key-integration)
-		 ;; (racket-mode . lsp)
-		 (geiser-guil . lsp)
 		 (elisp-mode . lsp)
-		 (go-ts-mode . lsp)
+		 (go-mode . lsp)
 		 (rustic . lsp)
-		 ;; (c-ts-mode . lsp)
 		 (c-mode . lsp)
 		 (zig . lsp))
   :commands lsp
@@ -407,12 +426,6 @@ Add use-package support:
   :config
   (setq lsp-headerline-breadcrumb-enable nil))
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-#+end_src
-
-** C mode
-#+begin_src emacs-lisp
-(setq c-default-style "linux")
-(add-hook 'c-mode-hook (lambda () (c-set-style "linux")))
 #+end_src
 
 ** Company Mode
@@ -439,6 +452,15 @@ Add use-package support:
  'org-babel-load-languages
  '((python . t)
    (C . t)))
+
+(defun toggle-org-html-export-on-save ()
+  (interactive)
+  (if (memq 'org-html-export-to-html after-save-hook)
+      (progn
+        (remove-hook 'after-save-hook 'org-html-export-to-html t)
+        (message "Disabled org html export on save for current buffer..."))
+    (add-hook 'after-save-hook 'org-html-export-to-html nil t)
+    (message "Enabled org html export on save for current buffer...")))
 #+end_src
 
 * Typst Mode
