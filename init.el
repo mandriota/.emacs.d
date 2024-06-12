@@ -1,8 +1,3 @@
-(require 'server)
-(when (server-running-p)
-	(shell-command "tmux new-session -d 'emacsclient -c'")
-	(kill-emacs))
-
 (setenv "LDFLAGS" "-L/opt/homebrew/opt/openssl@3/lib")
 (setenv "CFLAGS" "-I/opt/homebrew/opt/openssl@3/include")
 
@@ -74,6 +69,9 @@
 (global-set-key (kbd "C-x C-2") #'split-window-below)
 (global-set-key (kbd "C-x C-3") #'split-window-right)
 (global-set-key (kbd "C-x C-0") #'delete-window)
+
+(global-set-key [wheel-right] '(lambda () (interactive) (scroll-left 4)))
+(global-set-key [wheel-left] '(lambda () (interactive) (scroll-right 4)))
 
 (setq visible-bell t)
 (setq-default tab-width 2)
@@ -174,10 +172,6 @@
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
-(use-package fira-code-mode
-  :custom (fira-code-mode-disabled-ligatures '("[]" "x"))
-  :hook prog-mode)
-
 (use-package all-the-icons
   :if (display-graphic-p))
 
@@ -209,14 +203,19 @@
   (dashboard-icon-type 'all-the-icons)
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
-  (dashboard-startup-banner nil)
+  (dashboard-startup-banner 'ascii)
   (dashboard-banner-logo-title nil)
   (dashboard-set-init-info nil)
   :config
   (dashboard-setup-startup-hook))
 
-(use-package whole-line-or-region
-  :config (whole-line-or-region-global-mode))
+(use-package undo-tree
+	:config
+	(global-undo-tree-mode))
+
+(use-package avy
+	:config
+	(global-set-key (kbd "C-w") 'avy-goto-word-0))
 
 (use-package god-mode
   :config
@@ -243,7 +242,9 @@
   (global-set-key (kbd "s-<mouse-1>") 'mc/add-cursor-on-click))
 
 (use-package kaomel
-  :straight  (:type git :host github :repo "gicrisf/kaomel"))
+  :straight  (:type git :host github :repo "gicrisf/kaomel")
+	:custom
+	(kaomel-path "~/.emacs.d/kaomoji.json"))
 
 (global-set-key (kbd "C-s-k") #'kaomel-insert)
 
@@ -288,26 +289,70 @@
   (setq fish-enable-auto-indent t))
 (use-package zig-mode)
 (use-package go-mode)
+(use-package lsp-java)
 
 (use-package dap-mode)
 
+;; (use-package lsp-mode
+;;   :custom
+;;   (lsp-keymap-prefix "C-c l")
+;;   :hook ((lsp-mode . lsp-enable-which-key-integration)
+;; 		 (elisp-mode . lsp)
+;; 		 (go-mode . lsp)
+;; 		 (rustic . lsp)
+;; 		 (c-mode . lsp)
+;; 		 (zig . lsp))
+;;   :commands lsp
+;;   :config
+;;   (require 'dap-cpptools))
+
+;; (use-package lsp-ui
+;;   :commands lsp-ui-mode
+;;   :config
+;;   (setq lsp-headerline-breadcrumb-enable nil))
+;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 (use-package lsp-mode
-  :custom
-  (lsp-keymap-prefix "C-c l")
-  :hook ((lsp-mode . lsp-enable-which-key-integration)
-		 (elisp-mode . lsp)
-		 (go-mode . lsp)
-		 (rustic . lsp)
-		 (c-mode . lsp)
-		 (zig . lsp))
+  :ensure
   :commands lsp
+  :custom
+  ;; what to use when checking on-save. "check" is default, I prefer clippy
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-eldoc-render-all nil)
+  ;; (lsp-idle-delay 0.6)
+  ;; enable / disable the hints as you prefer:
+  (lsp-inlay-hint-enable t)
+	(lsp-headerline-breadcrumb-enable nil)
+  ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
+  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
+  (lsp-rust-analyzer-display-closure-return-type-hints t)
+  (lsp-rust-analyzer-display-parameter-hints nil)
+  (lsp-rust-analyzer-display-reborrow-hints nil)
+
+	(lsp-go-analyses '((shadow . t)
+                     (simplifycompositelit . :json-false)))
+	:hook ((lsp-mode . lsp-enable-which-key-integration)
+				 (python-mode . lsp)
+				 (elisp-mode . lsp)
+				 (java-mode . lsp)
+				 (go-mode . lsp)
+				 (rustic . lsp)
+				 (c-mode . lsp)
+				 (zig . lsp))
   :config
-  (require 'dap-cpptools))
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+	(require 'dap-cpptools))
 
 (use-package lsp-ui
+  :ensure
   :commands lsp-ui-mode
-  :config
-  (setq lsp-headerline-breadcrumb-enable nil))
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-enable t)
+	(lsp-ui-sideline-enable nil))
+
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
 (use-package company
@@ -327,7 +372,8 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
-   (C . t)))
+   (C . t)
+	 (shell . t)))
 
 (defun toggle-org-html-export-on-save ()
   (interactive)
@@ -338,10 +384,10 @@
     (add-hook 'after-save-hook 'org-html-export-to-html nil t)
     (message "Enabled org html export on save for current buffer...")))
 
-(use-package typst-ts-mode
-  :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
-  :custom
-  (typst-ts-mode-watch-options "--open"))
+;; (use-package typst-ts-mode
+;;   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
+;;   :custom
+;;   (typst-ts-mode-watch-options "--open"))
 
 (use-package visual-fill-column
   :commands visual-fill-column-mode
