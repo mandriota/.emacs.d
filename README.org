@@ -224,6 +224,7 @@ Bootstrap straight. Straight is an overengineered package manager:
 
 Add use-package support:
 #+begin_src emacs-lisp
+(straight-use-package 'use-package)
 (setq straight-use-package-by-default t)
 #+end_src
 
