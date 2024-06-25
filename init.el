@@ -70,8 +70,8 @@
 (global-set-key (kbd "C-x C-3") #'split-window-right)
 (global-set-key (kbd "C-x C-0") #'delete-window)
 
-(global-set-key [wheel-right] '(lambda () (interactive) (scroll-left 4)))
-(global-set-key [wheel-left] '(lambda () (interactive) (scroll-right 4)))
+(global-set-key [wheel-right] #'(lambda () (interactive) (scroll-left 4)))
+(global-set-key [wheel-left] #'(lambda () (interactive) (scroll-right 4)))
 
 (setq visible-bell t)
 (setq-default tab-width 2)
@@ -210,8 +210,10 @@
   :config
   (dashboard-setup-startup-hook))
 
+(use-package queue)
 (use-package undo-tree
 	:config
+	:after (queue)
 	(global-undo-tree-mode))
 
 (use-package avy
@@ -280,61 +282,59 @@
 
 (use-package magit)
 
+(setenv "PYTHONIOENCODING" "utf8")
+
+(setq python-shell-interpreter-args "-m asyncio")
+
+(use-package lsp-pyright
+  :hook (python-mode . (lambda () (require 'lsp-pyright)))
+  :init (when (executable-find "python3")
+          (setq lsp-pyright-python-executable-cmd "python3")))
+
+(use-package py-autopep8
+	:custom
+	(py-autopep8-options '("--max-line-length=80")))
+
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
   :custom
   (rustic-format-on-save t))
+
 (use-package fish-mode
   :mode ("\\.fish$")
   :config
   (setq fish-enable-auto-indent t))
+
 (use-package zig-mode)
+
 (use-package go-mode)
+
 (use-package lsp-java)
 
 (use-package dap-mode)
 
-;; (use-package lsp-mode
-;;   :custom
-;;   (lsp-keymap-prefix "C-c l")
-;;   :hook ((lsp-mode . lsp-enable-which-key-integration)
-;; 		 (elisp-mode . lsp)
-;; 		 (go-mode . lsp)
-;; 		 (rustic . lsp)
-;; 		 (c-mode . lsp)
-;; 		 (zig . lsp))
-;;   :commands lsp
-;;   :config
-;;   (require 'dap-cpptools))
+(use-package flycheck)
 
-;; (use-package lsp-ui
-;;   :commands lsp-ui-mode
-;;   :config
-;;   (setq lsp-headerline-breadcrumb-enable nil))
-;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 (use-package lsp-mode
   :ensure
   :commands lsp
   :custom
-  ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all nil)
-  ;; (lsp-idle-delay 0.6)
-  ;; enable / disable the hints as you prefer:
   (lsp-inlay-hint-enable t)
 	(lsp-headerline-breadcrumb-enable nil)
-  ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
   (lsp-rust-analyzer-display-chaining-hints t)
   (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints nil)
-
 	(lsp-go-analyses '((shadow . t)
                      (simplifycompositelit . :json-false)))
 	:hook ((lsp-mode . lsp-enable-which-key-integration)
+				 (lsp-mode . flycheck)
 				 (python-mode . lsp)
+				 (python-mode . py-autopep8-mode)
 				 (elisp-mode . lsp)
 				 (java-mode . lsp)
 				 (go-mode . lsp)
@@ -417,6 +417,11 @@
 (add-hook 'telega-load-hook 'telega-notifications-mode)
 (use-package language-detection)
 (define-key global-map (kbd "C-c t") telega-prefix-map)
+
+(use-package ement
+	:straight (:type git :host github :repo "alphapapa/ement.el")
+	:custom
+	(ement-room-compose-method 'compose-buffer))
 
 (unless (server-running-p)
 	(server-start))
