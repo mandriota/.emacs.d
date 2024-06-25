@@ -295,6 +295,11 @@
 	:custom
 	(py-autopep8-options '("--max-line-length=80")))
 
+(use-package pyvenv
+  :config
+  (pyvenv-tracking-mode)
+  (add-hook 'pyvenv-post-activate-hooks 'lsp))
+
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
   :custom
@@ -332,7 +337,6 @@
 	(lsp-go-analyses '((shadow . t)
                      (simplifycompositelit . :json-false)))
 	:hook ((lsp-mode . lsp-enable-which-key-integration)
-				 (lsp-mode . flycheck)
 				 (python-mode . lsp)
 				 (python-mode . py-autopep8-mode)
 				 (elisp-mode . lsp)
