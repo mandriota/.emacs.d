@@ -72,6 +72,12 @@ Print start-up time:
 #+begin_src emacs-lisp
 (setq column-number-mode t)
 (blink-cursor-mode -1)
+
+(pixel-scroll-mode)
+(setq pixel-dead-time 0)
+(setq pixel-resolution-fine-flag t)
+(setq mouse-wheel-scroll-amount '(1))
+(setq mouse-wheel-progressive-speed nil)
 #+end_src
 
 ** Games
@@ -176,6 +182,11 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 (setq ispell-list-command "list")
 #+end_src
 
+* Basic GPG
+#+begin_src emacs-lisp
+(setq epa-pinentry-mode 'loopback)
+#+end_src
+
 * Basic Tree Sitter
 #+begin_src emacs-lisp
 (setq treesit-language-source-alist
@@ -274,7 +285,9 @@ Add use-package support:
 
 * VTerm
 #+begin_src emacs-lisp
-(use-package vterm)
+(use-package vterm
+	:custom
+	(shell-file-name explicit-shell-file-name))
 #+end_src
 
 * Dashboard
@@ -302,8 +315,8 @@ Add use-package support:
 #+begin_src emacs-lisp
 (use-package queue)
 (use-package undo-tree
-	:config
 	:after (queue)
+	:config
 	(global-undo-tree-mode))
 #+end_src
 
@@ -422,6 +435,42 @@ Add use-package support:
   :config
   (pyvenv-tracking-mode)
   (add-hook 'pyvenv-post-activate-hooks 'lsp))
+
+(use-package ein)
+#+end_src
+
+* TypeScript
+#+begin_src emacs-lisp
+(use-package typescript-mode)
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save))
+	:config
+	(add-hook 'js2-mode-hook #'setup-tide-mode)
+	;; configure javascript-tide checker to run after your default javascript checker
+	(flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
+#+end_src
+
+* C
+#+begin_src emacs-lisp
+(defun user/clang-format-save-hook-for-this-buffer ()
+  "Create a buffer local save hook."
+  (add-hook 'before-save-hook
+            (lambda ()
+              (when (locate-dominating-file "." ".clang-format")
+                (clang-format-buffer))
+              ;; Continue to save.
+              nil)
+            nil
+            ;; Buffer local hook.
+            t))
+
+(use-package clang-format
+	:hook
+	((c-mode . (lambda () (user/clang-format-save-hook-for-this-buffer)))))
 #+end_src
 
 * Rust
@@ -471,6 +520,7 @@ Add use-package support:
   :ensure
   :commands lsp
   :custom
+	(lsp-enable-file-watchers nil)
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all nil)
   (lsp-inlay-hint-enable t)
@@ -484,6 +534,8 @@ Add use-package support:
 	(lsp-go-analyses '((shadow . t)
                      (simplifycompositelit . :json-false)))
 	:hook ((lsp-mode . lsp-enable-which-key-integration)
+				 (typescript-mode . lsp)
+				 (javascript-mode . lsp)
 				 (python-mode . lsp)
 				 (python-mode . py-autopep8-mode)
 				 (elisp-mode . lsp)
@@ -552,6 +604,12 @@ Readable LaTeX:
 ;;   :custom
 ;;   (typst-ts-mode-watch-options "--open"))
 #+end_src
+
+* CSV Mode
+#+begin_src emacs-lisp
+(use-package csv-mode)
+#+end_src
+
 
 * Visual Fill Column Mode
 #+begin_src emacs-lisp

@@ -46,6 +46,12 @@
 (setq column-number-mode t)
 (blink-cursor-mode -1)
 
+(pixel-scroll-mode)
+(setq pixel-dead-time 0)
+(setq pixel-resolution-fine-flag t)
+(setq mouse-wheel-scroll-amount '(1))
+(setq mouse-wheel-progressive-speed nil)
+
 (setq gamegrid-glyph-height-mm 7)
 
 (add-hook 'tetris-mode-hook 'visual-fill-column-mode)
@@ -121,6 +127,8 @@
 (setq ispell-program-name "aspell") 
 (setq ispell-list-command "list")
 
+(setq epa-pinentry-mode 'loopback)
+
 (setq treesit-language-source-alist
 	  '((bash "https://github.com/tree-sitter/tree-sitter-bash")
 		(c "https://github.com/tree-sitter/tree-sitter-c")
@@ -191,7 +199,9 @@
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
 
-(use-package vterm)
+(use-package vterm
+	:custom
+	(shell-file-name explicit-shell-file-name))
 
 (use-package dashboard
   :after (projectile all-the-icons)
@@ -212,8 +222,8 @@
 
 (use-package queue)
 (use-package undo-tree
-	:config
 	:after (queue)
+	:config
 	(global-undo-tree-mode))
 
 (use-package avy
@@ -300,6 +310,36 @@
   (pyvenv-tracking-mode)
   (add-hook 'pyvenv-post-activate-hooks 'lsp))
 
+(use-package ein)
+
+(use-package typescript-mode)
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save))
+	:config
+	(add-hook 'js2-mode-hook #'setup-tide-mode)
+	;; configure javascript-tide checker to run after your default javascript checker
+	(flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
+
+(defun user/clang-format-save-hook-for-this-buffer ()
+  "Create a buffer local save hook."
+  (add-hook 'before-save-hook
+            (lambda ()
+              (when (locate-dominating-file "." ".clang-format")
+                (clang-format-buffer))
+              ;; Continue to save.
+              nil)
+            nil
+            ;; Buffer local hook.
+            t))
+
+(use-package clang-format
+	:hook
+	((c-mode . (lambda () (user/clang-format-save-hook-for-this-buffer)))))
+
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
   :custom
@@ -324,6 +364,7 @@
   :ensure
   :commands lsp
   :custom
+	(lsp-enable-file-watchers nil)
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all nil)
   (lsp-inlay-hint-enable t)
@@ -337,6 +378,8 @@
 	(lsp-go-analyses '((shadow . t)
                      (simplifycompositelit . :json-false)))
 	:hook ((lsp-mode . lsp-enable-which-key-integration)
+				 (typescript-mode . lsp)
+				 (javascript-mode . lsp)
 				 (python-mode . lsp)
 				 (python-mode . py-autopep8-mode)
 				 (elisp-mode . lsp)
@@ -394,6 +437,8 @@
 ;;   :custom
 ;;   (typst-ts-mode-watch-options "--open"))
 
+(use-package csv-mode)
+
 (use-package visual-fill-column
   :commands visual-fill-column-mode
   :custom
@@ -429,3 +474,15 @@
 
 (unless (server-running-p)
 	(server-start))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ein:output-area-inlined-images t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
