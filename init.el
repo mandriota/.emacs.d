@@ -101,6 +101,15 @@
 
 (define-key org-mode-map (kbd "C-i") #'user/indent-org-block)
 
+(defun toggle-org-html-export-on-save ()
+  (interactive)
+  (if (memq 'org-html-export-to-html after-save-hook)
+      (progn
+        (remove-hook 'after-save-hook 'org-html-export-to-html t)
+        (message "Disabled org html export on save for current buffer..."))
+    (add-hook 'after-save-hook 'org-html-export-to-html nil t)
+    (message "Enabled org html export on save for current buffer...")))
+
 (setq c-basic-offset 2)
 (setq c-indent-level 2)
 (setq tab-width 2)
@@ -155,6 +164,8 @@
 		(typst "https://github.com/uben0/tree-sitter-typst")
 		(yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
+(add-to-list 'auto-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode))
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -199,10 +210,6 @@
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
 
-(use-package vterm
-	:custom
-	(shell-file-name explicit-shell-file-name))
-
 (use-package dashboard
   :after (projectile all-the-icons)
   :custom
@@ -220,9 +227,13 @@
   :config
   (dashboard-setup-startup-hook))
 
+(use-package vterm
+	:custom
+	(shell-file-name explicit-shell-file-name))
+
 (use-package queue)
 (use-package undo-tree
-	:after (queue)
+	:after queue
 	:config
 	(global-undo-tree-mode))
 
@@ -345,16 +356,33 @@
   :custom
   (rustic-format-on-save t))
 
+(use-package zig-mode)
+
+(use-package go-mode)
+
+(use-package ob-go
+	:after go-mode)
+
 (use-package fish-mode
   :mode ("\\.fish$")
   :config
   (setq fish-enable-auto-indent t))
 
-(use-package zig-mode)
+(use-package ob-fish
+  :straight  (:type git :host github :repo "takeokunn/ob-fish"))
 
-(use-package go-mode)
+(use-package csv-mode)
 
-(use-package lsp-java)
+;; (use-package typst-ts-mode
+;;   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
+;;   :custom
+;;   (typst-ts-mode-watch-options "--open"))
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (C . t)
+	 (shell . t)))
 
 (use-package dap-mode)
 
@@ -383,7 +411,6 @@
 				 (python-mode . lsp)
 				 (python-mode . py-autopep8-mode)
 				 (elisp-mode . lsp)
-				 (java-mode . lsp)
 				 (go-mode . lsp)
 				 (rustic . lsp)
 				 (c-mode . lsp)
@@ -414,31 +441,6 @@
 
   (company-tng-configure-default))
 
-(use-package ob-go)
-(use-package ob-fish
-  :straight  (:type git :host github :repo "takeokunn/ob-fish"))
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
-   (C . t)
-	 (shell . t)))
-
-(defun toggle-org-html-export-on-save ()
-  (interactive)
-  (if (memq 'org-html-export-to-html after-save-hook)
-      (progn
-        (remove-hook 'after-save-hook 'org-html-export-to-html t)
-        (message "Disabled org html export on save for current buffer..."))
-    (add-hook 'after-save-hook 'org-html-export-to-html nil t)
-    (message "Enabled org html export on save for current buffer...")))
-
-;; (use-package typst-ts-mode
-;;   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
-;;   :custom
-;;   (typst-ts-mode-watch-options "--open"))
-
-(use-package csv-mode)
-
 (use-package visual-fill-column
   :commands visual-fill-column-mode
   :custom
@@ -459,30 +461,5 @@
 
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
-(use-package telega
-  :commands (telega)
-  :defer t)
-
-(add-hook 'telega-load-hook 'telega-notifications-mode)
-(use-package language-detection)
-(define-key global-map (kbd "C-c t") telega-prefix-map)
-
-(use-package ement
-	:straight (:type git :host github :repo "alphapapa/ement.el")
-	:custom
-	(ement-room-compose-method 'compose-buffer))
-
 (unless (server-running-p)
 	(server-start))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ein:output-area-inlined-images t))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

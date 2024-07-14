@@ -148,6 +148,15 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
     (org-edit-src-exit)))
 
 (define-key org-mode-map (kbd "C-i") #'user/indent-org-block)
+
+(defun toggle-org-html-export-on-save ()
+  (interactive)
+  (if (memq 'org-html-export-to-html after-save-hook)
+      (progn
+        (remove-hook 'after-save-hook 'org-html-export-to-html t)
+        (message "Disabled org html export on save for current buffer..."))
+    (add-hook 'after-save-hook 'org-html-export-to-html nil t)
+    (message "Enabled org html export on save for current buffer...")))
 #+end_src
 
 * Basic C Mode
@@ -214,6 +223,8 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 		(typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
 		(typst "https://github.com/uben0/tree-sitter-typst")
 		(yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+(add-to-list 'auto-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode))
 #+end_src
 
 * Package Manager
@@ -283,14 +294,7 @@ Add use-package support:
   (define-key projectile-mode-map (kbd "M-p") 'projectile-command-map))
 #+end_src
 
-* VTerm
-#+begin_src emacs-lisp
-(use-package vterm
-	:custom
-	(shell-file-name explicit-shell-file-name))
-#+end_src
-
-* Dashboard
+** Dashboard
 #+begin_src emacs-lisp
 (use-package dashboard
   :after (projectile all-the-icons)
@@ -310,12 +314,19 @@ Add use-package support:
   (dashboard-setup-startup-hook))
 #+end_src
 
+* VTerm
+#+begin_src emacs-lisp
+(use-package vterm
+	:custom
+	(shell-file-name explicit-shell-file-name))
+#+end_src
+
 * Text Editing & Navigation
 ** Undo Tree
 #+begin_src emacs-lisp
 (use-package queue)
 (use-package undo-tree
-	:after (queue)
+	:after queue
 	:config
 	(global-undo-tree-mode))
 #+end_src
@@ -416,7 +427,8 @@ Add use-package support:
 (use-package magit)
 #+end_src
 
-* Python
+* Languages Support
+** Python
 #+begin_src emacs-lisp
 (setenv "PYTHONIOENCODING" "utf8")
 
@@ -439,7 +451,7 @@ Add use-package support:
 (use-package ein)
 #+end_src
 
-* TypeScript
+** TypeScript
 #+begin_src emacs-lisp
 (use-package typescript-mode)
 (use-package tide
@@ -454,7 +466,7 @@ Add use-package support:
 	(flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
 #+end_src
 
-* C
+** C
 #+begin_src emacs-lisp
 (defun user/clang-format-save-hook-for-this-buffer ()
   "Create a buffer local save hook."
@@ -473,7 +485,7 @@ Add use-package support:
 	((c-mode . (lambda () (user/clang-format-save-hook-for-this-buffer)))))
 #+end_src
 
-* Rust
+** Rust
 #+begin_src emacs-lisp
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
@@ -481,7 +493,23 @@ Add use-package support:
   (rustic-format-on-save t))
 #+end_src
 
-* Fish
+** Zig
+#+begin_src emacs-lisp
+(use-package zig-mode)
+#+end_src
+
+** Go
+#+begin_src emacs-lisp
+(use-package go-mode)
+#+end_src
+
+Babel:
+#+begin_src emacs-lisp
+(use-package ob-go
+	:after go-mode)
+#+end_src
+
+** Fish
 #+begin_src emacs-lisp
 (use-package fish-mode
   :mode ("\\.fish$")
@@ -489,19 +517,33 @@ Add use-package support:
   (setq fish-enable-auto-indent t))
 #+end_src
 
-* Zig
+Babel:
 #+begin_src emacs-lisp
-(use-package zig-mode)
+(use-package ob-fish
+  :straight  (:type git :host github :repo "takeokunn/ob-fish"))
 #+end_src
 
-* Go
+** CSV Mode
 #+begin_src emacs-lisp
-(use-package go-mode)
+(use-package csv-mode)
 #+end_src
 
-* Java
+** Typst Mode
+Readable LaTeX:
+#+begin_src emacs-lisp :exports none
+;; (use-package typst-ts-mode
+;;   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
+;;   :custom
+;;   (typst-ts-mode-watch-options "--open"))
+#+end_src
+
+** Load Org Babel
 #+begin_src emacs-lisp
-(use-package lsp-java)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (C . t)
+	 (shell . t)))
 #+end_src
 
 * Debug
@@ -539,7 +581,6 @@ Add use-package support:
 				 (python-mode . lsp)
 				 (python-mode . py-autopep8-mode)
 				 (elisp-mode . lsp)
-				 (java-mode . lsp)
 				 (go-mode . lsp)
 				 (rustic . lsp)
 				 (c-mode . lsp)
@@ -574,43 +615,6 @@ Add use-package support:
   (company-tng-configure-default))
 #+end_src
 
-* Org Mode
-** Org Babel
-#+begin_src emacs-lisp
-(use-package ob-go)
-(use-package ob-fish
-  :straight  (:type git :host github :repo "takeokunn/ob-fish"))
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
-   (C . t)
-	 (shell . t)))
-
-(defun toggle-org-html-export-on-save ()
-  (interactive)
-  (if (memq 'org-html-export-to-html after-save-hook)
-      (progn
-        (remove-hook 'after-save-hook 'org-html-export-to-html t)
-        (message "Disabled org html export on save for current buffer..."))
-    (add-hook 'after-save-hook 'org-html-export-to-html nil t)
-    (message "Enabled org html export on save for current buffer...")))
-#+end_src
-
-* Typst Mode
-Readable LaTeX:
-#+begin_src emacs-lisp
-;; (use-package typst-ts-mode
-;;   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
-;;   :custom
-;;   (typst-ts-mode-watch-options "--open"))
-#+end_src
-
-* CSV Mode
-#+begin_src emacs-lisp
-(use-package csv-mode)
-#+end_src
-
-
 * Visual Fill Column Mode
 #+begin_src emacs-lisp
 (use-package visual-fill-column
@@ -635,26 +639,6 @@ Readable LaTeX:
   (add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
-#+end_src
-
-* Messengers
-** Telegram
-#+begin_src emacs-lisp :results silent
-(use-package telega
-  :commands (telega)
-  :defer t)
-
-(add-hook 'telega-load-hook 'telega-notifications-mode)
-(use-package language-detection)
-(define-key global-map (kbd "C-c t") telega-prefix-map)
-#+end_src
-
-** Matrix
-#+begin_src emacs-lisp
-(use-package ement
-	:straight (:type git :host github :repo "alphapapa/ement.el")
-	:custom
-	(ement-room-compose-method 'compose-buffer))
 #+end_src
 
 * Start Server
