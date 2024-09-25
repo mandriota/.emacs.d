@@ -159,6 +159,12 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
     (message "Enabled org html export on save for current buffer...")))
 #+end_src
 
+* Basic LaTeX
+#+begin_src emacs-lisp
+(setq-default TeX-engine 'xetex)
+#+end_src
+
+
 * Basic C Mode
 #+begin_src emacs-lisp
 (setq c-basic-offset 2)
@@ -322,6 +328,18 @@ Add use-package support:
 #+end_src
 
 * Text Editing & Navigation
+** Expand Region
+#+begin_src emacs-lisp
+(use-package expand-region
+  :bind ("C-=" . er/expand-region))
+#+end_src
+
+** Move Text
+#+begin_src emacs-lisp
+(use-package move-text)
+(move-text-default-bindings)
+#+end_src
+
 ** Undo Tree
 #+begin_src emacs-lisp
 (use-package queue)
@@ -509,6 +527,13 @@ Babel:
 	:after go-mode)
 #+end_src
 
+** FGScript
+#+begin_src emacs-lisp
+(use-package fgscript-mode
+  :straight (:type git :host github :repo "mandriota/fgscript"
+                   :files ("editors/emacs/fgscript-mode.el")))
+#+end_src
+
 ** Fish
 #+begin_src emacs-lisp
 (use-package fish-mode
@@ -531,10 +556,10 @@ Babel:
 ** Typst Mode
 Readable LaTeX:
 #+begin_src emacs-lisp :exports none
-;; (use-package typst-ts-mode
-;;   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
-;;   :custom
-;;   (typst-ts-mode-watch-options "--open"))
+(use-package typst-ts-mode
+  :straight (:type git :host codeberg :repo "meow_king/typst-ts-mode")
+  :custom
+  (typst-ts-mode-watch-options "--open"))
 #+end_src
 
 ** Load Org Babel
@@ -565,7 +590,7 @@ Readable LaTeX:
 	(lsp-enable-file-watchers nil)
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all nil)
-  (lsp-inlay-hint-enable t)
+  ;;(lsp-inlay-hint-enable t)
 	(lsp-headerline-breadcrumb-enable nil)
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
   (lsp-rust-analyzer-display-chaining-hints t)
@@ -573,8 +598,7 @@ Readable LaTeX:
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints nil)
-	(lsp-go-analyses '((shadow . t)
-                     (simplifycompositelit . :json-false)))
+	(lsp-go-analyses '((simplifycompositelit . :json-false)))
 	:hook ((lsp-mode . lsp-enable-which-key-integration)
 				 (typescript-mode . lsp)
 				 (javascript-mode . lsp)

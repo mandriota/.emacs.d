@@ -110,6 +110,8 @@
     (add-hook 'after-save-hook 'org-html-export-to-html nil t)
     (message "Enabled org html export on save for current buffer...")))
 
+(setq-default TeX-engine 'xetex)
+
 (setq c-basic-offset 2)
 (setq c-indent-level 2)
 (setq tab-width 2)
@@ -230,6 +232,12 @@
 (use-package vterm
 	:custom
 	(shell-file-name explicit-shell-file-name))
+
+(use-package expand-region
+  :bind ("C-=" . er/expand-region))
+
+(use-package move-text)
+(move-text-default-bindings)
 
 (use-package queue)
 (use-package undo-tree
@@ -363,6 +371,10 @@
 (use-package ob-go
 	:after go-mode)
 
+(use-package fgscript-mode
+  :straight (:type git :host github :repo "mandriota/fgscript"
+                   :files ("editors/emacs/fgscript-mode.el")))
+
 (use-package fish-mode
   :mode ("\\.fish$")
   :config
@@ -373,10 +385,10 @@
 
 (use-package csv-mode)
 
-;; (use-package typst-ts-mode
-;;   :straight (:type git :host sourcehut :repo "meow_king/typst-ts-mode")
-;;   :custom
-;;   (typst-ts-mode-watch-options "--open"))
+(use-package typst-ts-mode
+  :straight (:type git :host codeberg :repo "meow_king/typst-ts-mode")
+  :custom
+  (typst-ts-mode-watch-options "--open"))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -395,7 +407,7 @@
 	(lsp-enable-file-watchers nil)
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all nil)
-  (lsp-inlay-hint-enable t)
+  ;;(lsp-inlay-hint-enable t)
 	(lsp-headerline-breadcrumb-enable nil)
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
   (lsp-rust-analyzer-display-chaining-hints t)
@@ -403,8 +415,7 @@
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints nil)
-	(lsp-go-analyses '((shadow . t)
-                     (simplifycompositelit . :json-false)))
+	(lsp-go-analyses '((simplifycompositelit . :json-false)))
 	:hook ((lsp-mode . lsp-enable-which-key-integration)
 				 (typescript-mode . lsp)
 				 (javascript-mode . lsp)
