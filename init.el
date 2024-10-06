@@ -31,6 +31,8 @@
 (setq recentf-max-menu-items 50
 	  recentf-max-saved-items 50)
 
+(setq make-backup-files nil)
+
 (setq inhibit-startup-screen t
 	  use-dialog-box nil
 	  ns-pop-up-frames nil)
@@ -189,7 +191,7 @@
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   :config
-  (load-theme 'doom-nord t)
+  (load-theme 'doom-gruvbox t)
 
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
