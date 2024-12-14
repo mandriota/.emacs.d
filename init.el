@@ -96,7 +96,6 @@ Terminal opens in the current buffer's directory with a split."
   (let* ((current-dir (user/get-current-buffer-directory))
          (escaped-dir (shell-quote-argument (expand-file-name current-dir))))
     
-    ;; AppleScript for precise Terminal window control
     (start-process 
      "terminal-tile" 
      nil 
@@ -118,7 +117,6 @@ tell application \"System Events\"
 	end tell
 end tell")))
 
-;; Optional: Add a keybinding
 (global-set-key (kbd "C-c t") 'user/macos-tile-emacs-terminal)
 
 (setq visible-bell t)
