@@ -1,6 +1,7 @@
 (setenv "LDFLAGS" "-L/opt/homebrew/opt/openssl@3/lib")
 (setenv "CFLAGS" "-I/opt/homebrew/opt/openssl@3/include")
 
+(add-to-list 'exec-path "~/.nix-profile/bin")
 (add-to-list 'exec-path "/opt/homebrew/bin")
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "~/.cargo/bin")
@@ -58,7 +59,7 @@
 
 (add-hook 'tetris-mode-hook 'visual-fill-column-mode)
 
-(let ((sh-path "/opt/homebrew/bin/fish"))
+(let ((sh-path "/run/current-system/sw/bin/fish"))
   (if (file-exists-p sh-path)
 	  (setq-default explicit-shell-file-name sh-path)
 	(message "fish shell not found")))
@@ -80,6 +81,45 @@
 
 (global-set-key [wheel-right] #'(lambda () (interactive) (scroll-left 4)))
 (global-set-key [wheel-left] #'(lambda () (interactive) (scroll-right 4)))
+
+(defun user/get-current-buffer-directory ()
+  "Get the directory of the current buffer."
+  (if (and (buffer-file-name)
+           (file-exists-p (buffer-file-name)))
+      (file-name-directory (buffer-file-name))
+    default-directory))
+
+(defun user/macos-tile-emacs-terminal ()
+  "Tile Emacs to the left half of the screen and Terminal to the right half.
+Terminal opens in the current buffer's directory with a split."
+  (interactive)
+  (let* ((current-dir (user/get-current-buffer-directory))
+         (escaped-dir (shell-quote-argument (expand-file-name current-dir))))
+    
+    ;; AppleScript for precise Terminal window control
+    (start-process 
+     "terminal-tile" 
+     nil 
+     "osascript" 
+     "-e" 
+     "
+tell application \"System Events\"
+	tell process \"Terminal\"
+    activate
+
+		set frontmost to true
+		delay 0.5
+		
+		tell menu bar 1
+			tell menu item \"Right & Left\" of menu \"Move & Resize\" of menu item \"Move & Resize\" of menu \"Window\" of menu bar item \"Window\"
+				click
+			end tell
+		end tell
+	end tell
+end tell")))
+
+;; Optional: Add a keybinding
+(global-set-key (kbd "C-c t") 'user/macos-tile-emacs-terminal)
 
 (setq visible-bell t)
 (setq-default tab-width 2)
@@ -116,6 +156,7 @@
 
 (setq c-basic-offset 2)
 (setq c-indent-level 2)
+(setq c-ts-mode-indent-offset 2)
 (setq tab-width 2)
 
 (defun user/outline-level ()
@@ -166,7 +207,8 @@
 		(tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
 		(typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
 		(typst "https://github.com/uben0/tree-sitter-typst")
-		(yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+		(yaml "https://github.com/ikatyang/tree-sitter-yaml")
+		(nix "https://github.com/nix-community/tree-sitter-nix")))
 
 (add-to-list 'auto-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode))
 
@@ -231,9 +273,17 @@
   :config
   (dashboard-setup-startup-hook))
 
-(use-package vterm
-	:custom
-	(shell-file-name explicit-shell-file-name))
+(use-package dired-subtree
+	:config
+	(define-key dired-mode-map "i" 'dired-subtree-toggle)
+	(advice-add 'dired-subtree-toggle :after (lambda ()
+                                             (interactive)
+                                             (when all-the-icons-dired-mode
+                                               (revert-buffer)))))
+
+;; (use-package vterm
+;; 	:custom
+;; 	(shell-file-name explicit-shell-file-name))
 
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
@@ -251,21 +301,23 @@
 	:config
 	(global-set-key (kbd "C-w") 'avy-goto-word-0))
 
-(use-package god-mode
-  :config
-  (global-set-key (kbd "<escape>") #'god-mode)
+;; (use-package god-mode
+;;   :config
+;;   (global-set-key (kbd "<escape>") #'god-mode)
 
-  (define-key god-local-mode-map (kbd "z") #'repeat)
+;;   (define-key god-local-mode-map (kbd "z") #'repeat)
   
-  (define-key god-local-mode-map (kbd "[") #'backward-paragraph)
-  (define-key god-local-mode-map (kbd "]") #'forward-paragraph))
+;;   (define-key god-local-mode-map (kbd "[") #'backward-paragraph)
+;;   (define-key god-local-mode-map (kbd "]") #'forward-paragraph))
 
-(defun user/god-mode-update-cursor ()
-  (if (or god-local-mode buffer-read-only)
-	  (set-cursor-color "cyan")
-	(set-cursor-color "white")))
+;; (defun user/god-mode-update-cursor ()
+;;   (if (or god-local-mode buffer-read-only)
+;; 	  (set-cursor-color "cyan")
+;; 	(set-cursor-color "white")))
 
-(add-hook 'post-command-hook #'user/god-mode-update-cursor)
+;; (add-hook 'post-command-hook #'user/god-mode-update-cursor)
+
+(use-package devil)
 
 (use-package multiple-cursors
   :config
@@ -312,6 +364,9 @@
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 
 (use-package magit)
+
+(use-package nix-ts-mode
+	:mode "\\.nix\\'")
 
 (setenv "PYTHONIOENCODING" "utf8")
 
@@ -360,6 +415,8 @@
 (use-package clang-format
 	:hook
 	((c-mode . (lambda () (user/clang-format-save-hook-for-this-buffer)))))
+
+(add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
 
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
@@ -427,6 +484,7 @@
 				 (go-mode . lsp)
 				 (rustic . lsp)
 				 (c-mode . lsp)
+				 (c-ts-mode . lsp)
 				 (zig . lsp))
   :config
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
