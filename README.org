@@ -147,18 +147,14 @@ Terminal opens in the current buffer's directory with a split."
      "osascript" 
      "-e" 
      "
-tell application \"System Events\"
-	tell process \"Terminal\"
+tell application \"System Events\" to tell process \"Terminal\"
     activate
 
-		set frontmost to true
-		
-		tell menu bar 1
-			tell menu item \"Right & Left\" of menu \"Move & Resize\" of menu item \"Move & Resize\" of menu \"Window\" of menu bar item \"Window\"
-				click
-			end tell
-		end tell
-	end tell
+    set frontmost to true
+        
+    tell menu bar 1 to tell menu item \"Right & Left\" of menu \"Move & Resize\" of menu item \"Move & Resize\" of menu \"Window\" of menu bar item \"Window\"
+        click
+    end tell
 end tell")))
 
 (global-set-key (kbd "C-c t") 'user/macos-tile-emacs-terminal)
