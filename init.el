@@ -89,30 +89,32 @@
       (file-name-directory (buffer-file-name))
     default-directory))
 
-(defun user/macos-tile-emacs-terminal ()
-  "Tile Emacs to the left half of the screen and Terminal to the right half.
-Terminal opens in the current buffer's directory with a split."
+(defun user/macos-fullscreen-tile-terminal ()
+  "Fullscreen tile Terminal window to the right half of the screen with the current directory opened."
   (interactive)
   (let* ((current-dir (user/get-current-buffer-directory))
          (escaped-dir (shell-quote-argument (expand-file-name current-dir))))
     
-    (start-process 
+		(start-process 
      "terminal-tile" 
      nil 
      "osascript" 
      "-e" 
-     "
-tell application \"System Events\" to tell process \"Terminal\"
-    activate
+     (format "
+tell application \"Terminal\"
+    do script \"cd %s\"
+end tell
 
+tell application \"System Events\" to tell process \"Terminal\"
     set frontmost to true
         
-    tell menu bar 1 to tell menu item \"Right & Left\" of menu \"Move & Resize\" of menu item \"Move & Resize\" of menu \"Window\" of menu bar item \"Window\"
-        click
+    tell menu bar 1 to tell menu \"Window\" of menu bar item \"Window\"
+        click menu item \"Right of Screen\" of menu \"Full Screen Tile\" of menu item \"Full Screen Tile\"
     end tell
-end tell")))
+end tell" escaped-dir))
+		))
 
-(global-set-key (kbd "C-c t") 'user/macos-tile-emacs-terminal)
+(global-set-key (kbd "C-c t") 'user/macos-fullscreen-tile-terminal)
 
 (setq visible-bell t)
 (setq-default tab-width 2)
@@ -333,6 +335,11 @@ end tell")))
 					  "~/.emacs.d/AndreaCrotti_snippets"))
   :config
   (yas-global-mode 1))
+
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (("C-c c" . jinx-correct)
+         ("C-c l" . jinx-languages)))
 
 (use-package which-key
   :config
