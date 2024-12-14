@@ -152,7 +152,6 @@ tell application \"System Events\"
     activate
 
 		set frontmost to true
-		delay 0.5
 		
 		tell menu bar 1
 			tell menu item \"Right & Left\" of menu \"Move & Resize\" of menu item \"Move & Resize\" of menu \"Window\" of menu bar item \"Window\"
