@@ -82,6 +82,18 @@
 (global-set-key [wheel-right] #'(lambda () (interactive) (scroll-left 4)))
 (global-set-key [wheel-left] #'(lambda () (interactive) (scroll-right 4)))
 
+(defvar user/macos-fullscreen-tile-terminal-osascript "
+tell application \"Terminal\" to do script \"cd %s\"
+
+tell application \"System Events\" to tell process \"Terminal\"
+    set frontmost to true
+        
+    tell menu bar 1 to tell menu \"Window\" of menu bar item \"Window\"
+        click menu item \"Right of Screen\" of menu \"Full Screen Tile\" of menu item \"Full Screen Tile\"
+    end tell
+end tell
+" "AppleScript to tile Terminal to the right half of the screen and open a directory.")
+
 (defun user/get-current-buffer-directory ()
   "Get the directory of the current buffer."
   (if (and (buffer-file-name)
@@ -93,26 +105,14 @@
   "Fullscreen tile Terminal window to the right half of the screen with the current directory opened."
   (interactive)
   (let* ((current-dir (user/get-current-buffer-directory))
-         (escaped-dir (shell-quote-argument (expand-file-name current-dir))))
-    
-		(start-process 
-     "terminal-tile" 
-     nil 
-     "osascript" 
-     "-e" 
-     (format "
-tell application \"Terminal\"
-    do script \"cd %s\"
-end tell
+         (escaped-dir (shell-quote-argument (expand-file-name current-dir)))
+				 (script (format user/macos-fullscreen-tile-terminal-osascript escaped-dir)))
 
-tell application \"System Events\" to tell process \"Terminal\"
-    set frontmost to true
-        
-    tell menu bar 1 to tell menu \"Window\" of menu bar item \"Window\"
-        click menu item \"Right of Screen\" of menu \"Full Screen Tile\" of menu item \"Full Screen Tile\"
-    end tell
-end tell" escaped-dir))
-		))
+		(start-process
+     "terminal-tile"
+     nil
+     "osascript"
+     "-e" script)))
 
 (global-set-key (kbd "C-c t") 'user/macos-fullscreen-tile-terminal)
 
@@ -172,6 +172,8 @@ end tell" escaped-dir))
 (global-set-key (kbd "C-c o") 'outline-hide-other)
 (global-set-key (kbd "C-c p") 'outline-show-entry)
 (global-set-key (kbd "C-c u") 'outline-show-all)
+
+(setq js-indent-level 2)
 
 (setq ispell-program-name "aspell") 
 (setq ispell-list-command "list")
@@ -522,11 +524,19 @@ end tell" escaped-dir))
   :custom
   (nov-text-width t)
   :config
-	(defun user/nov-font-setup ()
-	  (face-remap-add-relative 'variable-pitch :family "Georgia"
-                               :height 1.2))
-	(add-hook 'nov-mode-hook 'user/nov-font-setup)
-	
+  (defun user/nov-font-setup ()
+    (face-remap-add-relative 'variable-pitch :family "Georgia"
+                             :height 1.2))
+  (add-hook 'nov-mode-hook 'user/nov-font-setup)
+
+  (defun user/nov-remove-extra-newlines ()
+    "Remove consecutive blank lines and 3 or more consecutive spaces containing newlines in the current buffer."
+    (goto-char (point-min))
+    (while (re-search-forward "\n[[:space:]]*\n[[:space:]]*\n" nil t)
+      (replace-match "\n\n")))
+
+  (add-hook 'nov-post-html-render-hook #'user/nov-remove-extra-newlines)
+  
   (add-hook 'nov-mode-hook 'visual-line-mode)
   (add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
