@@ -250,6 +250,12 @@ end tell
 (setq epa-pinentry-mode 'loopback)
 #+end_src
 
+* Basic GNUS
+#+begin_src emacs-lisp :tangle ~/.gnus.el
+(setq gnus-select-method
+			'(nntp "news.gwene.org"))
+#+end_src
+
 * Basic Tree Sitter
 #+begin_src emacs-lisp
 (setq treesit-language-source-alist
