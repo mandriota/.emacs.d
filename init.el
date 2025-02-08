@@ -136,6 +136,7 @@ end tell
     (indent-region (point-min) (point-max))
     (org-edit-src-exit)))
 
+(define-key org-mode-map (kbd "<tab>") nil)
 (define-key org-mode-map (kbd "C-i") #'user/indent-org-block)
 
 (defun toggle-org-html-export-on-save ()
@@ -298,23 +299,23 @@ end tell
 	:config
 	(global-set-key (kbd "C-w") 'avy-goto-word-0))
 
-;; (use-package god-mode
-;;   :config
-;;   (global-set-key (kbd "<escape>") #'god-mode)
+(use-package god-mode
+  :config
+	(define-key org-mode-map (kbd "<tab>") #'god-mode)
 
-;;   (define-key god-local-mode-map (kbd "z") #'repeat)
+  (define-key god-local-mode-map (kbd "z") #'repeat)
   
-;;   (define-key god-local-mode-map (kbd "[") #'backward-paragraph)
-;;   (define-key god-local-mode-map (kbd "]") #'forward-paragraph))
+  (define-key god-local-mode-map (kbd "[") #'backward-paragraph)
+  (define-key god-local-mode-map (kbd "]") #'forward-paragraph)
+	
+	(define-key god-local-mode-map (kbd "C-<f11>") #'toggle-frame-fullscreen)
 
-;; (defun user/god-mode-update-cursor ()
-;;   (if (or god-local-mode buffer-read-only)
-;; 	  (set-cursor-color "cyan")
-;; 	(set-cursor-color "white")))
+	(defun user/god-mode-update-cursor ()
+		(if (or god-local-mode buffer-read-only)
+				(set-cursor-color "cyan")
+			(set-cursor-color "white")))
 
-;; (add-hook 'post-command-hook #'user/god-mode-update-cursor)
-
-(use-package devil)
+	(add-hook 'post-command-hook #'user/god-mode-update-cursor))
 
 (use-package multiple-cursors
   :config
