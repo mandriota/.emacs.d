@@ -7,6 +7,7 @@
 (add-to-list 'exec-path "~/.cargo/bin")
 (add-to-list 'exec-path "~/go/bin")
 (add-to-list 'exec-path "/opt/homebrew/Cellar/libgccjit/13.2.0/lib/gcc/current/")
+(add-to-list 'exec-path "/run/current-system/sw/bin/")
 
 (setenv "PATH"
 		(concat
@@ -176,6 +177,8 @@ end tell
 
 (setq js-indent-level 2)
 
+(setq scheme-program-name "guile -s")
+
 (setq ispell-program-name "aspell") 
 (setq ispell-list-command "list")
 
@@ -231,7 +234,8 @@ end tell
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   :config
-  (load-theme 'doom-gruvbox t)
+	(system-dark-mode-p)
+	(load-theme (if (system-dark-mode-p) 'doom-gruvbox 'doom-gruvbox-light) t)
 
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
@@ -243,7 +247,7 @@ end tell
   :after all-the-icons
   :straight (:type git :host github :repo "jtbm37/all-the-icons-dired")
   :config
-  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+  :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package all-the-icons-ivy-rich
   :after (all-the-icons ivy-rich)
@@ -313,9 +317,9 @@ end tell
 	(defun user/god-mode-update-cursor ()
 		(if (or god-local-mode buffer-read-only)
 				(set-cursor-color "cyan")
-			(set-cursor-color "white")))
+			(set-cursor-color (if (system-dark-mode-p) "white" "black"))))
 
-	(add-hook 'post-command-hook #'user/god-mode-update-cursor))
+	:hook (post-command . user/god-mode-update-cursor))
 
 (use-package multiple-cursors
   :config
@@ -339,10 +343,10 @@ end tell
   :config
   (yas-global-mode 1))
 
-(use-package jinx
-  :hook (emacs-startup . global-jinx-mode)
-  :bind (("C-c c" . jinx-correct)
-         ("C-c l" . jinx-languages)))
+;; (use-package jinx
+;;   :hook (emacs-startup . global-jinx-mode)
+;;   :bind (("C-c c" . jinx-correct)
+;;          ("C-c l" . jinx-languages)))
 
 (use-package which-key
   :config
@@ -387,7 +391,7 @@ end tell
 (use-package pyvenv
   :config
   (pyvenv-tracking-mode)
-  (add-hook 'pyvenv-post-activate-hooks 'lsp))
+  :hook (pyvenv-post-activate-hooks . lsp))
 
 (use-package ein)
 
@@ -399,9 +403,9 @@ end tell
          (typescript-mode . tide-hl-identifier-mode)
          (before-save . tide-format-before-save))
 	:config
-	(add-hook 'js2-mode-hook #'setup-tide-mode)
 	;; configure javascript-tide checker to run after your default javascript checker
-	(flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
+	(flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
+	:hook (js2-mode . setup-tide-mode))
 
 (defun user/clang-format-save-hook-for-this-buffer ()
   "Create a buffer local save hook."
@@ -479,6 +483,7 @@ end tell
   (lsp-rust-analyzer-display-reborrow-hints nil)
 	(lsp-go-analyses '((simplifycompositelit . :json-false)))
 	:hook ((lsp-mode . lsp-enable-which-key-integration)
+				 (lsp-mode . lsp-ui-mode)
 				 (typescript-mode . lsp)
 				 (javascript-mode . lsp)
 				 (python-mode . lsp)
@@ -490,7 +495,6 @@ end tell
 				 (c-ts-mode . lsp)
 				 (zig . lsp))
   :config
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
 	(require 'dap-cpptools))
 
 (use-package lsp-ui
@@ -510,10 +514,10 @@ end tell
   (company-minimum-prefix-length 1)
   (company-selection-wrap-around t)
   :config
-  (add-hook 'after-init-hook 'global-company-mode)
   (global-set-key (kbd "C-c y") 'company-yasnippet)
 
-  (company-tng-configure-default))
+  (company-tng-configure-default)
+	:hook (after-init . global-company-mode))
 
 (use-package visual-fill-column
   :commands visual-fill-column-mode
@@ -524,6 +528,8 @@ end tell
 (use-package nov
   :custom
   (nov-text-width t)
+	:hook ((nov-mode . visual-line-mode)
+				 (nov-mode . visual-fill-column-mode))
   :config
   (defun user/nov-font-setup ()
     (face-remap-add-relative 'variable-pitch :family "Georgia"
@@ -537,9 +543,6 @@ end tell
       (replace-match "\n\n")))
 
   (add-hook 'nov-post-html-render-hook #'user/nov-remove-extra-newlines)
-  
-  (add-hook 'nov-mode-hook 'visual-line-mode)
-  (add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
