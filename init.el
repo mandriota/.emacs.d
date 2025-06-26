@@ -70,6 +70,11 @@
 
 (global-set-key (kbd "C-c r") #'recentf)
 
+(global-set-key (kbd "C-c i") 'outline-hide-body)
+(global-set-key (kbd "C-c o") 'outline-hide-other)
+(global-set-key (kbd "C-c p") 'outline-show-entry)
+(global-set-key (kbd "C-c u") 'outline-show-all)
+
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'control))
 
@@ -149,6 +154,8 @@ end tell
     (add-hook 'after-save-hook 'org-html-export-to-html nil t)
     (message "Enabled org html export on save for current buffer...")))
 
+(global-set-key (kbd "C-c b h") 'org-fold-hide-block-toggle)
+
 (setq-default TeX-engine 'xetex)
 
 (setq c-basic-offset 2)
@@ -169,11 +176,6 @@ end tell
             (setq outline-regexp "//=:[a-zA-Z]+\\(:[a-zA-Z]+\\)?")
             (setq outline-level 'user/outline-level)
 						(hide-body)))
-
-(global-set-key (kbd "C-c i") 'outline-hide-body)
-(global-set-key (kbd "C-c o") 'outline-hide-other)
-(global-set-key (kbd "C-c p") 'outline-show-entry)
-(global-set-key (kbd "C-c u") 'outline-show-all)
 
 (setq js-indent-level 2)
 
@@ -343,10 +345,14 @@ end tell
   :config
   (yas-global-mode 1))
 
-;; (use-package jinx
-;;   :hook (emacs-startup . global-jinx-mode)
-;;   :bind (("C-c c" . jinx-correct)
-;;          ("C-c l" . jinx-languages)))
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (("C-c c" . jinx-correct)
+         ("C-c l" . jinx-languages))
+:config
+(setq jinx--compile-flags
+      (append jinx--compile-flags
+              '("-I/opt/homebrew/include/enchant-2" "-L/opt/homebrew/lib"))))
 
 (use-package which-key
   :config
@@ -373,7 +379,22 @@ end tell
 (use-package magit)
 
 (use-package nix-ts-mode
-	:mode "\\.nix\\'")
+	:mode "\\.nix\\'"
+	:bind (:map nix-ts-mode-map
+							("C-c C-f" . nixfmt)))
+
+(defun nixfmt ()
+  "Format the current buffer using nixfmt."
+  (interactive)
+  (if (executable-find "nixfmt")
+      (let ((original-point (point)))
+        (shell-command-on-region
+         (point-min) (point-max)
+         "nixfmt"
+         (current-buffer) t)
+        (goto-char original-point)
+        (message "Buffer formatted with nixfmt"))
+    (error "nixfmt not found in PATH")))
 
 (setenv "PYTHONIOENCODING" "utf8")
 
@@ -394,6 +415,8 @@ end tell
   :hook (pyvenv-post-activate-hooks . lsp))
 
 (use-package ein)
+
+(use-package poetry)
 
 (use-package typescript-mode)
 (use-package tide
@@ -456,11 +479,18 @@ end tell
   :custom
   (typst-ts-mode-watch-options "--open"))
 
+(use-package plantuml-mode
+	:custom
+	(plantuml-jar-path "/Users/mark/.emacs.d/bin/plantuml.jar")
+	(org-plantuml-jar-path "/Users/mark/.emacs.d/bin/plantuml.jar")
+	(plantuml-default-exec-mode 'jar))
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
    (C . t)
-	 (shell . t)))
+	 (shell . t)
+	 (plantuml . t)))
 
 (use-package dap-mode)
 
@@ -473,14 +503,14 @@ end tell
 	(lsp-enable-file-watchers nil)
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all nil)
-  ;;(lsp-inlay-hint-enable t)
+	(lsp-rust-analyzer-cargo-extra-env (make-hash-table))
 	(lsp-headerline-breadcrumb-enable nil)
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
   (lsp-rust-analyzer-display-chaining-hints t)
   (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
-  (lsp-rust-analyzer-display-reborrow-hints nil)
+	(lsp-rust-analyzer-inlay-hints-reborrow-hints-enable "never")
 	(lsp-go-analyses '((simplifycompositelit . :json-false)))
 	:hook ((lsp-mode . lsp-enable-which-key-integration)
 				 (lsp-mode . lsp-ui-mode)

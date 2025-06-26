@@ -6,8 +6,11 @@
 ;; appereance
 (add-to-list 'default-frame-alist '(undecorated-round . t))
 (add-to-list 'default-frame-alist '(vertical-scroll-bars . nil))
-(add-to-list 'default-frame-alist '(left-fringe . 5))
-(add-to-list 'default-frame-alist '(right-fringe . 5))
+(add-to-list 'default-frame-alist '(left-fringe . 6))
+(add-to-list 'default-frame-alist '(right-fringe . 6))
+(add-to-list 'default-frame-alist '(undecorated . t))
+(add-to-list 'default-frame-alist '(fullscreen . fullheight))
+(add-to-list 'default-frame-alist '(snap-width . 4))
 
 ;; theme
 (defun system-dark-mode-p ()
