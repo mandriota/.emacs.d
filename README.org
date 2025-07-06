@@ -168,11 +168,10 @@ end tell
 (global-set-key (kbd "C-c t") 'user/macos-fullscreen-tile-terminal)
 #+end_src
 
-
 * Basic Text Editing
 #+begin_src emacs-lisp
-(setq visible-bell t)
 (setq-default tab-width 2)
+(setq visible-bell t)
 
 (global-set-key (kbd "C-x s") #'replace-string)
 #+end_src
@@ -213,7 +212,6 @@ end tell
 #+begin_src emacs-lisp
 (setq-default TeX-engine 'xetex)
 #+end_src
-
 
 * Basic C Mode
 #+begin_src emacs-lisp
@@ -453,11 +451,6 @@ Add use-package support:
 	:hook (post-command . user/god-mode-update-cursor))
 #+end_src
 
-** Devil Mode
-#+begin_src emacs-lisp :tangle no
-(use-package devil)
-#+end_src
-
 ** Multiple cursors
 #+begin_src emacs-lisp
 (use-package multiple-cursors
@@ -467,16 +460,6 @@ Add use-package support:
   (global-set-key (kbd "C-)") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-c C-(") 'mc/mark-all-like-this)
   (global-set-key (kbd "s-<mouse-1>") 'mc/add-cursor-on-click))
-#+end_src
-
-** Kaomoji
-#+begin_src emacs-lisp
-(use-package kaomel
-  :straight  (:type git :host github :repo "gicrisf/kaomel")
-	:custom
-	(kaomel-path "~/.emacs.d/kaomoji.json"))
-
-(global-set-key (kbd "C-s-k") #'kaomel-insert)
 #+end_src
 
 ** Snippets
@@ -500,7 +483,6 @@ Add use-package support:
       (append jinx--compile-flags
               '("-I/opt/homebrew/include/enchant-2" "-L/opt/homebrew/lib"))))
 #+end_src
-
 
 * Which Key Mode
 #+begin_src emacs-lisp
@@ -542,8 +524,38 @@ Add use-package support:
 #+end_src
 
 * Languages Support
+#+name: enabled-languages
+| Language   | Enabled |
+|------------+---------|
+| nix        | yes     |
+| python     | no      |
+| typescript | no      |
+| rust       | yes     |
+| c          | no      |
+| zig        | no      |
+| go         | yes     |
+| fgscript   | no      |
+| fish       | no      |
+| csv        | no      |
+| typst      | no      |
+| plantuml   | no      |
+
+** Enabled Language
+#+begin_src emacs-lisp :var languages=enabled-languages
+(defvar user/enabled-languages
+	(mapcar #'car
+					(seq-filter (lambda (row) (string= (cadr row) "yes")) languages))
+	"List of enabled programming languages")
+
+(defun user/language-enabled-p (lang)
+  "Check if a programming language is enabled"
+  (member (symbol-name lang) user/enabled-languages))
+
+(message (format "Enabled languages: %s" user/enabled-languages))
+#+end_src
+
 ** Nix
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'nix) "init.el" "no")
 (use-package nix-ts-mode
 	:mode "\\.nix\\'"
 	:bind (:map nix-ts-mode-map
@@ -564,7 +576,7 @@ Add use-package support:
 #+end_src
 
 ** Python
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'python) "init.el" "no")
 (setenv "PYTHONIOENCODING" "utf8")
 
 (setq python-shell-interpreter-args "-m asyncio")
@@ -586,10 +598,12 @@ Add use-package support:
 (use-package ein)
 
 (use-package poetry)
+
+(add-to-list 'org-babel-load-languages '(python . t))
 #+end_src
 
 ** TypeScript
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'typescript) "init.el" "no")
 (use-package typescript-mode)
 (use-package tide
   :ensure t
@@ -604,7 +618,7 @@ Add use-package support:
 #+end_src
 
 ** C
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'c) "init.el" "no")
 (defun user/clang-format-save-hook-for-this-buffer ()
   "Create a buffer local save hook."
   (add-hook 'before-save-hook
@@ -622,10 +636,11 @@ Add use-package support:
 	((c-mode . (lambda () (user/clang-format-save-hook-for-this-buffer)))))
 
 (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+(add-to-list 'org-babel-load-languages '(C . t))
 #+end_src
 
 ** Rust
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'rust) "init.el" "no")
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
   :custom
@@ -633,30 +648,30 @@ Add use-package support:
 #+end_src
 
 ** Zig
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'zig) "init.el" "no")
 (use-package zig-mode)
 #+end_src
 
 ** Go
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'go) "init.el" "no")
 (use-package go-mode)
 #+end_src
 
 Babel:
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'go) "init.el" "no")
 (use-package ob-go
 	:after go-mode)
 #+end_src
 
 ** FGScript
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'fgscript) "init.el" "no")
 (use-package fgscript-mode
   :straight (:type git :host github :repo "mandriota/fgscript"
                    :files ("editors/emacs/fgscript-mode.el")))
 #+end_src
 
 ** Fish
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'fish) "init.el" "no")
 (use-package fish-mode
   :mode ("\\.fish$")
   :config
@@ -664,19 +679,19 @@ Babel:
 #+end_src
 
 Babel:
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'fish) "init.el" "no")
 (use-package ob-fish
   :straight  (:type git :host github :repo "takeokunn/ob-fish"))
 #+end_src
 
 ** CSV Mode
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'csv) "init.el" "no")
 (use-package csv-mode)
 #+end_src
 
 ** Typst Mode
 Readable LaTeX:
-#+begin_src emacs-lisp :exports none
+#+begin_src emacs-lisp :exports none :tangle (if (user/language-enabled-p 'typst) "init.el" "no")
 (use-package typst-ts-mode
   :straight (:type git :host codeberg :repo "meow_king/typst-ts-mode")
   :custom
@@ -684,22 +699,23 @@ Readable LaTeX:
 #+end_src
 
 ** Plantuml
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (user/language-enabled-p 'plantuml) "init.el" "no")
 (use-package plantuml-mode
 	:custom
 	(plantuml-jar-path "/Users/mark/.emacs.d/bin/plantuml.jar")
 	(org-plantuml-jar-path "/Users/mark/.emacs.d/bin/plantuml.jar")
 	(plantuml-default-exec-mode 'jar))
+
+(add-to-list 'org-babel-load-languages '(plantuml . t))
 #+end_src
 
 ** Load Org Babel
 #+begin_src emacs-lisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
-   (C . t)
-	 (shell . t)
-	 (plantuml . t)))
+(org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
+#+end_src
+
+#+begin_src c
+printf("hello");
 #+end_src
 
 * Debug

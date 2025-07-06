@@ -122,8 +122,8 @@ end tell
 
 (global-set-key (kbd "C-c t") 'user/macos-fullscreen-tile-terminal)
 
-(setq visible-bell t)
 (setq-default tab-width 2)
+(setq visible-bell t)
 
 (global-set-key (kbd "C-x s") #'replace-string)
 
@@ -331,13 +331,6 @@ end tell
   (global-set-key (kbd "C-c C-(") 'mc/mark-all-like-this)
   (global-set-key (kbd "s-<mouse-1>") 'mc/add-cursor-on-click))
 
-(use-package kaomel
-  :straight  (:type git :host github :repo "gicrisf/kaomel")
-	:custom
-	(kaomel-path "~/.emacs.d/kaomoji.json"))
-
-(global-set-key (kbd "C-s-k") #'kaomel-insert)
-
 (use-package yasnippet
   :custom
   (yas-snippet-dirs '(;; "~/.emacs.d/user_snippets"
@@ -378,6 +371,19 @@ end tell
 
 (use-package magit)
 
+(let ((languages '(("nix" "yes") ("python" "no") ("typescript" "no") ("rust" "yes") ("c" "no") ("zig" "no") ("go" "yes") ("fgscript" "no") ("fish" "no") ("csv" "no") ("typst" "no") ("plantuml" "no"))))
+(defvar user/enabled-languages
+	(mapcar #'car
+					(seq-filter (lambda (row) (string= (cadr row) "yes")) languages))
+	"List of enabled programming languages")
+
+(defun user/language-enabled-p (lang)
+  "Check if a programming language is enabled"
+  (member (symbol-name lang) user/enabled-languages))
+
+(message (format "Enabled languages: %s" user/enabled-languages))
+)
+
 (use-package nix-ts-mode
 	:mode "\\.nix\\'"
 	:bind (:map nix-ts-mode-map
@@ -396,101 +402,17 @@ end tell
         (message "Buffer formatted with nixfmt"))
     (error "nixfmt not found in PATH")))
 
-(setenv "PYTHONIOENCODING" "utf8")
-
-(setq python-shell-interpreter-args "-m asyncio")
-
-(use-package lsp-pyright
-  :hook (python-mode . (lambda () (require 'lsp-pyright)))
-  :init (when (executable-find "python3")
-          (setq lsp-pyright-python-executable-cmd "python3")))
-
-(use-package py-autopep8
-	:custom
-	(py-autopep8-options '("--max-line-length=80")))
-
-(use-package pyvenv
-  :config
-  (pyvenv-tracking-mode)
-  :hook (pyvenv-post-activate-hooks . lsp))
-
-(use-package ein)
-
-(use-package poetry)
-
-(use-package typescript-mode)
-(use-package tide
-  :ensure t
-  :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save))
-	:config
-	;; configure javascript-tide checker to run after your default javascript checker
-	(flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
-	:hook (js2-mode . setup-tide-mode))
-
-(defun user/clang-format-save-hook-for-this-buffer ()
-  "Create a buffer local save hook."
-  (add-hook 'before-save-hook
-            (lambda ()
-              (when (locate-dominating-file "." ".clang-format")
-                (clang-format-buffer))
-              ;; Continue to save.
-              nil)
-            nil
-            ;; Buffer local hook.
-            t))
-
-(use-package clang-format
-	:hook
-	((c-mode . (lambda () (user/clang-format-save-hook-for-this-buffer)))))
-
-(add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-
 (use-package rustic
   :mode ("\\.rs\\'" . rustic-mode)
   :custom
   (rustic-format-on-save t))
-
-(use-package zig-mode)
 
 (use-package go-mode)
 
 (use-package ob-go
 	:after go-mode)
 
-(use-package fgscript-mode
-  :straight (:type git :host github :repo "mandriota/fgscript"
-                   :files ("editors/emacs/fgscript-mode.el")))
-
-(use-package fish-mode
-  :mode ("\\.fish$")
-  :config
-  (setq fish-enable-auto-indent t))
-
-(use-package ob-fish
-  :straight  (:type git :host github :repo "takeokunn/ob-fish"))
-
-(use-package csv-mode)
-
-(use-package typst-ts-mode
-  :straight (:type git :host codeberg :repo "meow_king/typst-ts-mode")
-  :custom
-  (typst-ts-mode-watch-options "--open"))
-
-(use-package plantuml-mode
-	:custom
-	(plantuml-jar-path "/Users/mark/.emacs.d/bin/plantuml.jar")
-	(org-plantuml-jar-path "/Users/mark/.emacs.d/bin/plantuml.jar")
-	(plantuml-default-exec-mode 'jar))
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
-   (C . t)
-	 (shell . t)
-	 (plantuml . t)))
+(org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
 
 (use-package dap-mode)
 
