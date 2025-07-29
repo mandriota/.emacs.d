@@ -66,7 +66,7 @@
 	(message "fish shell not found")))
 
 (setq ns-alternate-modifier 'meta
-	  ns-right-alternate-modifier 'none)
+  	  ns-right-alternate-modifier 'none)
 
 (global-set-key (kbd "C-c r") #'recentf)
 
@@ -74,6 +74,9 @@
 (global-set-key (kbd "C-c o") 'outline-hide-other)
 (global-set-key (kbd "C-c p") 'outline-show-entry)
 (global-set-key (kbd "C-c u") 'outline-show-all)
+
+(with-eval-after-load 'dired
+  (define-key dired-mode-map (kbd "C-c C-w") 'wdired-change-to-wdired-mode))
 
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'control))
@@ -438,8 +441,8 @@ end tell
 				 (lsp-mode . lsp-ui-mode)
 				 (typescript-mode . lsp)
 				 (javascript-mode . lsp)
-				 (python-mode . lsp)
-				 (python-mode . py-autopep8-mode)
+				 ;; (python-mode . lsp)
+				 ;; (python-mode . py-autopep8-mode)
 				 (elisp-mode . lsp)
 				 (go-mode . lsp)
 				 (rustic . lsp)
