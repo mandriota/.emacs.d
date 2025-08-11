@@ -56,6 +56,8 @@
 (setq mouse-wheel-scroll-amount '(1))
 (setq mouse-wheel-progressive-speed nil)
 
+(hl-line-mode)
+
 (setq gamegrid-glyph-height-mm 7)
 
 (add-hook 'tetris-mode-hook 'visual-fill-column-mode)

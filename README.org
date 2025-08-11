@@ -4,6 +4,10 @@
 #+AUTHOR: Mark Mandriota
 #+STARTUP: showeverything
 
+*NOTE*:
+Partially AI were used for writing this config.
+Not everything is authored by me; nevertheless, everything was supervised and, if necessary, modified by me.
+
 * Prerequisites
 - Fish UNIX Shell (optional)
 - Git
@@ -13,7 +17,7 @@
 - Fira Code
 - Georgia
 
-* Basic Environment Variables
+* Basic: Environment Variables
 #+begin_src emacs-lisp
 (setenv "LDFLAGS" "-L/opt/homebrew/opt/openssl@3/lib")
 (setenv "CFLAGS" "-I/opt/homebrew/opt/openssl@3/include")
@@ -43,13 +47,13 @@
 		 "/Library/TeX/Distributions/Programs/texbin"))
 #+end_src
 
-* Basic Debug
+* Basic: Debug
 Print start-up time:
 #+begin_src emacs-lisp
 (add-hook 'after-init-hook (lambda () (message (emacs-init-time))))
 #+end_src
 
-* Basic Settings
+* Basic: Settings
 #+begin_src emacs-lisp
 (global-auto-revert-mode 1)
 (save-place-mode 1)
@@ -72,7 +76,7 @@ Print start-up time:
 (setq dired-dwim-target t)
 #+end_src
 
-** Appearance
+** Basic: Appearance
 #+begin_src emacs-lisp
 (setq column-number-mode t)
 (blink-cursor-mode -1)
@@ -82,18 +86,19 @@ Print start-up time:
 (setq pixel-resolution-fine-flag t)
 (setq mouse-wheel-scroll-amount '(1))
 (setq mouse-wheel-progressive-speed nil)
+
+(hl-line-mode)
 #+end_src
 
-** Games
+** Basic: Games
 #+begin_src emacs-lisp
 (setq gamegrid-glyph-height-mm 7)
 
 (add-hook 'tetris-mode-hook 'visual-fill-column-mode)
 #+end_src
 
-
-* Basic Shell
-** Set Shell Path
+* Basic: Shell
+** Basic: Set Shell Path
 Try to set fish shell as a default shell. Fish is a smart and user-friendly shell:
 #+begin_src emacs-lisp
 (let ((sh-path "/run/current-system/sw/bin/fish"))
@@ -102,7 +107,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 	(message "fish shell not found")))
 #+end_src
 
-* Basic Keybindings
+* Basic: Keybindings
 #+begin_src emacs-lisp
 (setq ns-alternate-modifier 'meta
   	  ns-right-alternate-modifier 'none)
@@ -118,7 +123,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
   (define-key dired-mode-map (kbd "C-c C-w") 'wdired-change-to-wdired-mode))
 #+end_src
 
-* Basic Windowing
+* Basic: Windowing
 #+begin_src emacs-lisp
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'control))
@@ -134,7 +139,7 @@ Try to set fish shell as a default shell. Fish is a smart and user-friendly shel
 (global-set-key [wheel-left] #'(lambda () (interactive) (scroll-right 4)))
 #+end_src
 
-* Basic Framing
+* Basic: Framing
 #+begin_src emacs-lisp
 (defvar user/macos-fullscreen-tile-terminal-osascript "
 tell application \"Terminal\" to do script \"cd %s\"
@@ -171,7 +176,7 @@ end tell
 (global-set-key (kbd "C-c t") 'user/macos-fullscreen-tile-terminal)
 #+end_src
 
-* Basic Text Editing
+* Basic: Text Editing
 #+begin_src emacs-lisp
 (setq-default tab-width 2)
 (setq visible-bell t)
@@ -179,7 +184,7 @@ end tell
 (global-set-key (kbd "C-x s") #'replace-string)
 #+end_src
 
-* Basic Org Mode
+* Basic: Org Mode
 #+begin_src emacs-lisp
 (require 'org)
 
@@ -211,12 +216,12 @@ end tell
 (global-set-key (kbd "C-c b h") 'org-fold-hide-block-toggle)
 #+end_src
 
-* Basic LaTeX
+* Basic: LaTeX
 #+begin_src emacs-lisp
 (setq-default TeX-engine 'xetex)
 #+end_src
 
-* Basic C Mode
+* Basic: C Mode
 #+begin_src emacs-lisp
 (setq c-basic-offset 2)
 (setq c-indent-level 2)
@@ -238,34 +243,34 @@ end tell
 						(hide-body)))
 #+end_src
 
-* Basic JS Mode
+* Basic: JS Mode
 #+begin_src emacs-lisp
 (setq js-indent-level 2)
 #+end_src
 
-* Basic Scheme mode
+* Basic: Scheme mode
 #+begin_src emacs-lisp
 (setq scheme-program-name "guile -s")
 #+end_src
 
-* Basic Spell check
+* Basic: Spell check
 #+begin_src emacs-lisp
 (setq ispell-program-name "aspell") 
 (setq ispell-list-command "list")
 #+end_src
 
-* Basic GPG
+* Basic: GPG
 #+begin_src emacs-lisp
 (setq epa-pinentry-mode 'loopback)
 #+end_src
 
-* Basic GNUS
+* Basic: GNUS
 #+begin_src emacs-lisp :tangle ~/.gnus.el
 (setq gnus-select-method
 			'(nntp "news.gwene.org"))
 #+end_src
 
-* Basic Tree Sitter
+* Basic: Tree Sitter
 #+begin_src emacs-lisp
 (setq treesit-language-source-alist
 	  '((bash "https://github.com/tree-sitter/tree-sitter-bash")
@@ -395,7 +400,6 @@ Add use-package support:
                                              (when all-the-icons-dired-mode
                                                (revert-buffer)))))
 #+end_src
-
 
 * VTerm
 #+begin_src emacs-lisp
