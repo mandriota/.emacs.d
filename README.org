@@ -5,7 +5,7 @@
 #+STARTUP: showeverything
 
 *NOTE*:
-Partially AI were used for writing this config.
+Partially AI was used for writing this config.
 Not everything is authored by me; nevertheless, everything was supervised and, if necessary, modified by me.
 
 * Prerequisites
